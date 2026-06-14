@@ -1,5 +1,15 @@
 import csv ,os
 
+def add_csv_header(csv_path, field):
+    file_exist = os.path.exists(csv_path)
+    with open (csv_path, mode= "w", newline="") as csv_file:
+        write = csv.DictWriter(csv_file, fieldnames=field)
+        if not file_exist:
+            write.writeheader()
+            print(f"Header Successfully Written in {csv_file}")
+        else:
+            print(f"{csv_path} Already Exists")
+
 
 def login():
     print("\nQ or q to quit")
@@ -15,7 +25,7 @@ def login():
 
             elif user_id.isdigit():
                 id_found = False
-                userdb_csv = "LibraryManagement\LibM1\libM1_IDs.csv"
+                userdb_csv = r"LibraryManagement\LibM1\user_db.csv"
 
                 if not os.path.isfile(userdb_csv):
                     print(f"Error: File {userdb_csv} not found")
@@ -59,7 +69,7 @@ def login():
         except Exception as e:
             print(f"\nLogin Error: {e}")
 
-
+# ---------------------------------------- ADMIN --------------------------------------
 def admin_dashboard(): 
     print ("------ Admin Dashboard ------------")
     print("1. Books List")
@@ -69,16 +79,7 @@ def admin_dashboard():
     print("1. Edit Users List")
 
 
-def user_db_headname():
-    fields = ["ID", "Role", "Username", "Password"]
-    filename = "LibraryManagement\LibM1\libM1_IDs.csv"
-    file_exist = os.path.exists(filename)
-    with open(filename, 'a') as userdb:
-        write = csv.DictWriter(userdb, fieldnames= fields)
-        if not file_exist:
-            write.writeheader()
-        #write.writerows
 
-user_db_headname()
+
 
 login()
