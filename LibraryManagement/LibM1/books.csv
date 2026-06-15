@@ -1,1 +1,3 @@
-B_ID,Title,Author,Published Year,DOI,Price,Total Qty,Available Qty,Inclusion Date
+B_ID,Title,ISBN,Author,Published Year,Description,Price NRS,Total Qty,Available Qty,Inclusion Date
+1,Into The Wild,9780385486804,Jon Krakauer,1996,Biography of christopher mccandless,799.0,10,10,2026-06-15 Mon
+2,1984,9781443434973,George Orwell,1949,Dystopian novel,1099.0,7,7,2026-06-15 Mon
