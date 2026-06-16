@@ -8,9 +8,9 @@ def add_csv_header(csv_path, field):
         write = csv.DictWriter(csv_file, fieldnames=field)
         if not file_exist:
             write.writeheader()
-            print(f"Header Successfully Written in {csv_file}")
+            print(f"\nHeader Successfully Written in {csv_file}")
         else:
-            print(f"{csv_path} Already Exists")
+            print(f"\n{csv_path} Already Exists")
 
 def check_file_existance(path):
     file_exist = os.path.exists(path)
@@ -19,7 +19,36 @@ def check_file_existance(path):
         return False
     return True
 
-# -------------------------------------- Validation --------------------------------
+# -------------------------------------- Validation For Users --------------------------------
+
+#--------------------------------------- BOTH ------------------------------------------------
+def valid_id(path, header):
+        try:
+            user_path = path
+            file_exists = check_file_existance(user_path)
+            last_row = None
+
+            if file_exists:
+                with open (user_path, mode="r") as user_file:
+                    id_read = csv.DictReader(user_file)
+                    for row in id_read:
+                        if row:
+                            last_row = row
+
+            if last_row:
+                last_id = last_row[header]
+                return int(last_id)
+            
+            return 0
+
+        except Exception as e:
+            print(f"\n ID Error: {e}")
+            # returning 0, to prevent int error while adding book
+            return 0
+        
+
+
+# -------------------------------------- Validation for Books --------------------------------
 
 def validate_title():
     while True: 
