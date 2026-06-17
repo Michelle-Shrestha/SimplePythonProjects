@@ -28,7 +28,7 @@ def login():
 
                     for row in (user_data): 
                         # the user_id must be in string format for checking
-                        if row.get('ID')== user_id: 
+                        if row.get('U_ID')== user_id: 
                             id_found = True
                             for i in range (3,0,-1):
                                 try:
@@ -41,7 +41,7 @@ def login():
                                             
                                     else:
                                         print("\nIncorrect Password!!!")
-                                        print(f"You have {i-1} left")
+                                        print(f"You have {i-1} tries left")
                                         if i ==1:
                                             print(f"\nTry again later!!!")
                                             break

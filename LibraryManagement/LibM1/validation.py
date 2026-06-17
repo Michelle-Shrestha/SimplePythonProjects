@@ -1,6 +1,7 @@
 import os, csv
 from datetime import datetime as dt, date as d
 import time as t
+import hashlib
 
 def add_csv_header(csv_path, field):
     file_exist = os.path.exists(csv_path)
@@ -19,7 +20,6 @@ def check_file_existance(path):
         return False
     return True
 
-# -------------------------------------- Validation For Users --------------------------------
 
 #--------------------------------------- BOTH ------------------------------------------------
 def valid_id(path, header):
@@ -34,22 +34,95 @@ def valid_id(path, header):
                     for row in id_read:
                         if row:
                             last_row = row
+                    #or can also do:
+                    # rows = list(id_read)
+                    #last_row = rows[-1]
 
             if last_row:
                 last_id = last_row[header]
                 return int(last_id)
             
-            return 0
+            return 0 # if there's nothing found returns 0
 
         except Exception as e:
             print(f"\n ID Error: {e}")
-            # returning 0, to prevent int error while adding book
+            # returning 0, to prevent int error while adding book id
             return 0
-        
 
+# -------------------------------------- Validation For Users --------------------------------
+
+#adding users
+def validate_username():
+    db_path = r"LibraryManagement\LibM1\user_db.csv"
+    while True:
+        found = False
+        with open (db_path, mode="r") as db_file:
+            u_read = csv.DictReader(db_file)
+            username = input("\nEnter the new username: ").title()
+            for row in u_read:
+                if row["Username"].title() ==username:
+                    found = True
+                    print(f"\nUsername \"{username}\" Already Exists")
+                    continue
+        if not found:
+            return username
+        
+def valid_role():
+    print("\nRoles:")
+    print("1. User")
+    print("2. Admin")
+    while True:
+        try:
+            role_input = int(input("\nSelect the Role: "))
+
+            if role_input ==1:
+                return "User"
+            elif role_input ==2:
+                return "Admin"
+            else:
+                print("\n Please select a role from the given option")
+            
+        except ValueError as ve:
+            print(f"\n Role Error: {ve}")
+    
+def validate_password():
+    db_path = r"LibraryManagement\LibM1\user_db.csv"
+    while True:
+        same_pw = False
+        with open(db_path, mode="r") as db_file:
+            read = csv.DictReader(db_file)
+            pw = input("\nEnter the new password: ")
+            c_pw = input("\nRe enter to confirm the password: ")
+
+            if pw == c_pw:
+                #hashlib is used to secure the user password
+                #hexdigest to conver it into hexa
+                h_pw = hashlib.sha256(pw.encode()).hexdigest()
+                return h_pw
+            else:
+                print("\n Password doesnot match")
+
+def valid_status():
+    print("\nStatus:")
+    print("1. Active")
+    print("2. Inactive")
+    while True:
+        try:
+            role_input = int(input("\nSelect the Status: "))
+
+            if role_input ==1:
+                return "Active"
+            elif role_input ==2:
+                return "Inactive"
+            else:
+                print("\n Please select the status from the given option")
+            
+        except ValueError as ve:
+            print(f"\n Status Error: {ve}")
 
 # -------------------------------------- Validation for Books --------------------------------
 
+#adding users
 def validate_title():
     while True: 
         try:
@@ -69,10 +142,10 @@ def enter_isbn():
         if isbn.upper() == "Q":
             exit()
         if not isbn.isdigit():
-            print("Enter a valid ISBN")
+            print("\n Invalid ISBN ")
         
         elif length!= 13:
-            print("Enter valid ISBN length")
+            print("\n Invalid ISBN length")
         else:
             return isbn
 
@@ -88,7 +161,7 @@ def validate_isbn():
                     found = False
                     for row in read:
                         if row["ISBN"] == isbn:
-                            print(f"Given book already exists!!!")
+                            print(f"\n Given isbn book already exists!!!")
                             found = True
                             break
                             
@@ -106,6 +179,8 @@ def validate_auhor(title):
             author = input(f"\nEnter the book \"{title}\" Author name: ").strip().title()
             if author.upper() == "Q":
                 exit()
+            if not author:
+                return "Unknown Author"
             return author
         except Exception as e:
             print(f"\n Error is {e}")
@@ -123,8 +198,8 @@ def validate_year(title):
                 print(f"\n Invalid year, IT must be more than year {old_year - 1}")
             else:
                 return year
-        except ValueError:
-            print("\n Enter valid integer!!!")
+        except ValueError as ve:
+            print(f"\n Invalid integer: {ve}!!!")
             
 
 def validate_price(title, curr_s = "NRS"):
@@ -141,8 +216,8 @@ def validate_price(title, curr_s = "NRS"):
                 print(f"\n Price must be more than {curr_symbol} {min_price - 1}")
             else:
                 return price
-        except ValueError:
-            print(f"\n Enter Valid Input!!!")
+        except ValueError as ve:
+            print(f"\n Inalid Input: {ve}!!!")
 
 def validate_total_qty():
     while True:
@@ -158,8 +233,8 @@ def validate_total_qty():
                 print(f"\n Atleast should have {min_qty} quantity")
             else:
                 return qty
-        except ValueError:
-            print(f"\n Error is {ValueError}")
+        except ValueError as ve:
+            print(f"\n Error is {ve}")
         except Exception as e:
             print(f"\n Error is {e}")
 
@@ -177,8 +252,8 @@ def validate_available_qty(t_qty):
                 print(f"\n Cant have negative quantity!!!")
             else:
                 return qty
-        except ValueError:
-            print(f"\n Error is {ValueError}")
+        except ValueError as ve:
+            print(f"\n Error is {ve}")
         except Exception as e:
             print(f"\n Error is {e}")
 
@@ -193,6 +268,9 @@ def validate_description(title):
             description = input(f"\n\"{title}\" Book Description: ").strip().capitalize()
             if description.upper() == "Q":
                 exit()
+
+            if not description:
+                return "Description not available"
             return description
         except Exception as e:
             print(f"\n Error is {e}")

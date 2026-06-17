@@ -12,8 +12,43 @@ def admin_dashboard():
 
 # fields = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Price', 'Total Qty', "Inclusion Date"]
 
-df = pd.read_csv(r"LibraryManagement\LibM1\user_db.csv")
-print(df)
+#df = pd.read_csv(r"LibraryManagement\LibM1\user_db.csv")
+#print(df)
+
+def add_user():
+    user_path = r"LibraryManagement\LibM1\user_db.csv"
+    file_exists = v.check_file_existance(user_path)
+    fields = ["U_ID", "Username","Role", "Password", "Status", "Created Date"]
+    if not file_exists:
+        v.add_csv_header(user_path, fields)
+
+    if file_exists:
+        with open(user_path, mode= "a+", newline="") as user_file:
+            db_write = csv.DictWriter(user_file, fieldnames=fields)
+            c_date = v.curr_date_time()
+            u_id = v.valid_id(user_path, "U_ID")
+            u_name = v.validate_username()
+            role = v.valid_role()
+            pw = v.validate_password()
+            status = v.valid_status()
+
+            try:
+                new_user ={
+                    "U_ID" : u_id +1,
+                    "Username": u_name,
+                    "Role": role,
+                    "Password": pw,
+                    "Status": status,
+                    "Created Date": c_date
+                    }
+
+                db_write.writerow(new_user)
+                print(f"\n{role} Added Successfully")
+            except Exception as e:
+                print(f"Adding user error: {e}")
+         
+
+add_user()
 
 
 def add_book():
@@ -26,11 +61,9 @@ def add_book():
 
     if file_exists:
         with open (book_path, mode= "a+", newline="") as book_file:
-            book_file.seek(0)
-            b_read = csv.DictReader(book_file)
             b_write = csv.DictWriter(book_file, fieldnames=fields)
-            rows = list(b_read)
-            b_id = len(rows)+1
+
+            b_id = v.valid_id(book_path,"B_ID")
             title = v.validate_title()
             isbn = v.validate_isbn()
             author = v.validate_auhor(title)
@@ -43,7 +76,7 @@ def add_book():
 
             try:
                 new_book = {
-                    "B_ID": b_id,
+                    "B_ID": b_id + 1,
                     "Title": title,
                     "ISBN": isbn,
                     "Author": author,
@@ -63,6 +96,8 @@ def add_book():
 
     
 #1001,Into The Wild,9780385486804,Jon Krakauer,1996,800.0,10,10
-add_book()
-df =pd.read_csv(r"LibraryManagement\LibM1\books.csv")
-print(df)
+#add_book()
+#df =pd.read_csv(r"LibraryManagement\LibM1\books.csv")
+#print(df)
+
+
