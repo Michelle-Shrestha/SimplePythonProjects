@@ -49,7 +49,9 @@ def valid_id(path, header):
             # returning 0, to prevent int error while adding book id
             return 0
 
+#---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation For Users --------------------------------
+
 
 #adding users
 def validate_username():
@@ -132,49 +134,13 @@ def valid_status():
             print(f"\n Status Error: {ve}")
 
 
-# view feature -----------------------
-def view_menu():
-    print("--------- Search ---------")
-    print("1. View Details ")
-    print("2. ID ")
-    print("3. Username ")
-    print("4. Role")
-    print("5. Created Date ")
-    print("6. Status ")
-    
+#---------Search feature -----------------------
 
-def view_user_details():
-    path = r"LibraryManagement\LibM1\user_db.csv"
-    c = 10
-    print("\n1. To View first All User")
-    print(f"2. To View first {c} users")
-    print(f"3. To View Last {c} user")
-    
-    try:
-        user_input = int(input("\nEnter your choice: "))
-        print("\n Users: ")
-        print()
-        
-        df = pd.read_csv(path)
-        if user_input ==1:
-            print(pd.DataFrame(df))
-        if user_input ==2:
-            print(df.head(c))
-        if user_input ==3:
-            print(df.tail(c))
-        
-    except pd.errors.EmptyDataError:
-        print(f"\n {path} file is empty")
 
-    except Exception as e:
-        print(f"\n Undexpected error: {e}")
-
-    
-view_user_details()
-
+#---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation for Books --------------------------------
 
-#adding users
+#adding books
 def validate_title():
     while True: 
         try:
@@ -213,7 +179,7 @@ def validate_isbn():
                     read = csv.DictReader(book_file)
                     found = False
                     for row in read:
-                        if row["ISBN"] == isbn:
+                        if row["ISBN"] == isbn: #checking if there's already the same isbn
                             print(f"\n Given isbn book already exists!!!")
                             found = True
                             break
@@ -329,33 +295,7 @@ def validate_description(title):
             print(f"\n Error is {e}")
 
 
-#Book view Feature ---------------------------
-#def book_menu():
+#-------- Search Book Feature ---------------------------
 
-def view_book_details():
-    path = r"LibraryManagement\LibM1\books.csv"
-    try: 
-        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS', 'Total Qty', 'Available Qty', "Inclusion Date"]
-        c = 10
-        print("\n1. To View first All Books")
-        print(f"2. To View first {c} Books")
-        print(f"3. To View Last {c} Books")
-        
-        user_input = int(input("\nEnter your choice: "))
-        print("\n Books: ")
-        print()
-        df = pd.read_csv(path, usecols= columns)
 
-        if user_input ==1:
-            print(pd.DataFrame(df))
-        if user_input ==2:
-            print(df.head(c))
-        if user_input ==3:
-            print(df.tail(c))
-            
-    except pd.errors.EmptyDataError:
-        print(f"\n {path} file is empty")
 
-    except Exception as e:
-        print(f"\n Undexpected error: {e}")
-view_book_details()

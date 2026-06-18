@@ -1,19 +1,74 @@
-import os, csv, pandas as pd, validation as v
+import os, csv, pandas as pd 
+import validation as v, menus as m #importing local py files
 
 
-def admin_dashboard(): 
-    print ("------ Admin Dashboard ------------")
-    print("1. Books List")
-    print("2. User Database")
-    print("1. Add New Book")
-    print("1. Add New Users")
-    print("2. Edit book list")
-    print("1. Edit Users List")
+def user_details():
+    path = r"LibraryManagement\LibM1\user_db.csv"
+    c = 10
+    print("\n1. To View first All User")
+    print(f"2. To View first {c} users")
+    print(f"3. To View Last {c} user")
+    
+    try:
+        user_input = int(input("\nEnter your choice: "))
+        print("\n Users: ")
+        print()
+        
+        df = pd.read_csv(path)
+        if user_input ==1:
+            print(pd.DataFrame(df))
+        if user_input ==2:
+            print(df.head(c))
+        if user_input ==3:
+            print(df.tail(c))
+        
+    except pd.errors.EmptyDataError:
+        print(f"\n {path} file is empty")
 
-# fields = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Price', 'Total Qty', "Inclusion Date"]
+    except Exception as e:
+        print(f"\n Undexpected error: {e}")
 
-#df = pd.read_csv(r"LibraryManagement\LibM1\user_db.csv")
-#print(df)
+
+def book_details(role):
+    path = r"LibraryManagement\LibM1\books.csv"
+    try: 
+        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
+        c = 2
+        print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
+        print(f"2. To View first {c} Books")
+        print(f"3. To View Last {c} Books")
+        
+        user_input = int(input("\nEnter your choice: "))
+        print("\n Books: ")
+        print()
+        if role == "Admin":
+            #prints all header for admin
+            df = pd.read_csv(path)
+
+            if user_input ==1:
+                print(df)
+            if user_input ==2:
+                print(df.head(c))
+            if user_input ==3:
+                print(df.tail(c))
+
+        if role == "User":
+            #prints only the selected header for users
+            df = pd.read_csv(path, usecols= columns)
+
+            if user_input ==1:
+                print(pd.DataFrame(df))
+            if user_input ==2:
+                print(df.head(c))
+            if user_input ==3:
+                print(df.tail(c))
+
+            
+    except pd.errors.EmptyDataError:
+        print(f"\n {path} file is empty")
+
+    except Exception as e:
+        print(f"\n Undexpected error: {e}")
 
 def add_user():
     user_path = r"LibraryManagement\LibM1\user_db.csv"
@@ -47,8 +102,26 @@ def add_user():
             except Exception as e:
                 print(f"Adding user error: {e}")
          
+def delete_users():
+    user_path = r"LibraryManagement\LibM1\user_db.csv"
+    file_exists = v.check_file_existance(user_path)
 
-add_user()
+    if  file_exists:
+            try:
+                del_id= int(input("\nUser ID to delete: "))
+                df = pd.read_csv(user_path)
+
+                if del_id not in df["U_ID"].values:
+                    print(f"\nID {del_id} does not exists")
+                else:
+                    df =df[df["U_ID"]!=del_id]
+                    df.to_csv(user_path, index=False)
+                    print(f"\nID {del_id} Deleted Successfully")
+
+            except ValueError as ve:
+                print(f"\n Deleter User Data Type Error: {ve}")
+            except Exception as e:
+                print(f"\n Delete User Error: {e}")
 
 
 def add_book():
@@ -94,10 +167,34 @@ def add_book():
             except Exception as e:
                 print(f"\n Adding Book Error: {e}")
 
-    
-#1001,Into The Wild,9780385486804,Jon Krakauer,1996,800.0,10,10
-#add_book()
-#df =pd.read_csv(r"LibraryManagement\LibM1\books.csv")
-#print(df)
+def del_book():
+    book_path = r"LibraryManagement\LibM1\books.csv"
+    file_exists = v.check_file_existance(book_path)
+    if file_exists:
+        try:
+            choice = m.del_book_menu()
+            df = pd.read_csv(book_path)
+            if choice ==1:
+                del_id = int(input("\nBook ISBN to delete: "))
+                if del_id not in df["B_ID"].values:
+                    print (f"\nBook ID {del_id} does not exists!!!")
+                else:
+                    df = df[df["B_ID"]!=del_id]
+                    df.to_csv(book_path, index=False)
+                    print(f"\nID {del_id} book deleted successfully")
 
+            elif choice ==2:
+                del_isbn = int(input("\nBook ISBN to delete: "))
 
+                if del_isbn not in df["ISBN"].values:
+                        print (f"\nISBN {del_isbn} book does not exists!!!")
+                else:
+                        df = df[df["ISBN"]!=del_isbn]
+                        df.to_csv(book_path, index= False)
+                        print(f"\nISBN {del_isbn} book deleted successfully")
+                    
+            
+        except ValueError as ve: 
+            print(f"Delete Value Error: {ve}")
+        except Exception as e:
+            print(f"Delete Error: {e}")
