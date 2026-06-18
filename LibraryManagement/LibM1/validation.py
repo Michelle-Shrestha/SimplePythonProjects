@@ -1,4 +1,4 @@
-import os, csv
+import os, csv, pandas as pd
 from datetime import datetime as dt, date as d
 import time as t
 import hashlib
@@ -90,17 +90,28 @@ def validate_password():
     while True:
         same_pw = False
         with open(db_path, mode="r") as db_file:
-            read = csv.DictReader(db_file)
-            pw = input("\nEnter the new password: ")
-            c_pw = input("\nRe enter to confirm the password: ")
+            try:
+                read = csv.DictReader(db_file)
+                pw = input("\nEnter the new password: ")
+                if not pw:
+                    print("\n Please enter password")
+                if pw:
+                    c_pw = input("\nRe enter to confirm the password: ")
+                    
+                    if not c_pw:
+                        print("\n Please enter confirm password")
+                    if c_pw:
+                        if pw == c_pw:
+                            #hashlib is used to secure the user password
+                            #hexdigest to conver it into hexa
+                            h_pw = hashlib.sha256(pw.encode()).hexdigest()
+                            return h_pw
+                        else:
+                            print("\n Password doesnot match")
 
-            if pw == c_pw:
-                #hashlib is used to secure the user password
-                #hexdigest to conver it into hexa
-                h_pw = hashlib.sha256(pw.encode()).hexdigest()
-                return h_pw
-            else:
-                print("\n Password doesnot match")
+            except Exception as e:
+                print(f"\n PW Error: {e}")
+
 
 def valid_status():
     print("\nStatus:")
@@ -119,6 +130,47 @@ def valid_status():
             
         except ValueError as ve:
             print(f"\n Status Error: {ve}")
+
+
+# view feature -----------------------
+def view_menu():
+    print("--------- Search ---------")
+    print("1. View Details ")
+    print("2. ID ")
+    print("3. Username ")
+    print("4. Role")
+    print("5. Created Date ")
+    print("6. Status ")
+    
+
+def view_user_details():
+    path = r"LibraryManagement\LibM1\user_db.csv"
+    c = 10
+    print("\n1. To View first All User")
+    print(f"2. To View first {c} users")
+    print(f"3. To View Last {c} user")
+    
+    try:
+        user_input = int(input("\nEnter your choice: "))
+        print("\n Users: ")
+        print()
+        
+        df = pd.read_csv(path)
+        if user_input ==1:
+            print(pd.DataFrame(df))
+        if user_input ==2:
+            print(df.head(c))
+        if user_input ==3:
+            print(df.tail(c))
+        
+    except pd.errors.EmptyDataError:
+        print(f"\n {path} file is empty")
+
+    except Exception as e:
+        print(f"\n Undexpected error: {e}")
+
+    
+view_user_details()
 
 # -------------------------------------- Validation for Books --------------------------------
 
@@ -148,6 +200,7 @@ def enter_isbn():
             print("\n Invalid ISBN length")
         else:
             return isbn
+   
 
 def validate_isbn():
     book_path = r"LibraryManagement\LibM1\books.csv"
@@ -275,3 +328,34 @@ def validate_description(title):
         except Exception as e:
             print(f"\n Error is {e}")
 
+
+#Book view Feature ---------------------------
+#def book_menu():
+
+def view_book_details():
+    path = r"LibraryManagement\LibM1\books.csv"
+    try: 
+        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS', 'Total Qty', 'Available Qty', "Inclusion Date"]
+        c = 10
+        print("\n1. To View first All Books")
+        print(f"2. To View first {c} Books")
+        print(f"3. To View Last {c} Books")
+        
+        user_input = int(input("\nEnter your choice: "))
+        print("\n Books: ")
+        print()
+        df = pd.read_csv(path, usecols= columns)
+
+        if user_input ==1:
+            print(pd.DataFrame(df))
+        if user_input ==2:
+            print(df.head(c))
+        if user_input ==3:
+            print(df.tail(c))
+            
+    except pd.errors.EmptyDataError:
+        print(f"\n {path} file is empty")
+
+    except Exception as e:
+        print(f"\n Undexpected error: {e}")
+view_book_details()
