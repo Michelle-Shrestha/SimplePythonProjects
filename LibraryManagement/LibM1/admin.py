@@ -11,64 +11,25 @@ def user_details():
     
     try:
         user_input = int(input("\nEnter your choice: "))
+        v.breaking(user_input)
         print("\n Users: ")
         print()
         
         df = pd.read_csv(path)
         if user_input ==1:
             print(pd.DataFrame(df))
-        if user_input ==2:
+        elif user_input ==2:
             print(df.head(c))
-        if user_input ==3:
+        elif user_input ==3:
             print(df.tail(c))
-        
+        else:
+            print("Select from the given options!!!")
     except pd.errors.EmptyDataError:
         print(f"\n {path} file is empty")
 
     except Exception as e:
         print(f"\n Undexpected error: {e}")
 
-
-def book_details(role):
-    path = r"LibraryManagement\LibM1\books.csv"
-    try: 
-        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
-        c = 2
-        print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
-        print(f"2. To View first {c} Books")
-        print(f"3. To View Last {c} Books")
-        
-        user_input = int(input("\nEnter your choice: "))
-        print("\n Books: ")
-        print()
-        if role == "Admin":
-            #prints all header for admin
-            df = pd.read_csv(path)
-
-            if user_input ==1:
-                print(df)
-            if user_input ==2:
-                print(df.head(c))
-            if user_input ==3:
-                print(df.tail(c))
-
-        if role == "User":
-            #prints only the selected header for users
-            df = pd.read_csv(path, usecols= columns)
-
-            if user_input ==1:
-                print(pd.DataFrame(df))
-            if user_input ==2:
-                print(df.head(c))
-            if user_input ==3:
-                print(df.tail(c))
-
-            
-    except pd.errors.EmptyDataError:
-        print(f"\n {path} file is empty")
-
-    except Exception as e:
-        print(f"\n Undexpected error: {e}")
 
 def add_user():
     user_path = r"LibraryManagement\LibM1\user_db.csv"
@@ -108,21 +69,66 @@ def delete_users():
 
     if  file_exists:
             try:
-                del_id= int(input("\nUser ID to delete: "))
+                del_id= input("\nUser ID to delete: ").upper()
+                v.breaking(del_id)
                 df = pd.read_csv(user_path)
+                if del_id.isdigit():
+                    try:
+                        del_id = int(del_id)
+                        if del_id not in df["U_ID"].values:
+                            print(f"\nID {del_id} does not exists")
+                        else:
+                            df =df[df["U_ID"]!=del_id]
+                            df.to_csv(user_path, index=False)
+                            print(f"\nID {del_id} Deleted Successfully")
 
-                if del_id not in df["U_ID"].values:
-                    print(f"\nID {del_id} does not exists")
-                else:
-                    df =df[df["U_ID"]!=del_id]
-                    df.to_csv(user_path, index=False)
-                    print(f"\nID {del_id} Deleted Successfully")
-
-            except ValueError as ve:
-                print(f"\n Deleter User Data Type Error: {ve}")
+                    except ValueError as ve:
+                        print(f"\n Deleter User Data Type Error: {ve}")
             except Exception as e:
                 print(f"\n Delete User Error: {e}")
 
+#def edit_users():
+
+# ------------------------------------------------------------------ Book ------------------------------------------------------------------------------------
+
+def book_details(role):
+    path = r"LibraryManagement\LibM1\books.csv"
+    try: 
+        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
+        c = 20
+        print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
+        print(f"2. To View first {c} Books")
+        print(f"3. To View Last {c} Books")
+        print("4. Exit ")
+        
+        user_input = int(input("\nEnter your choice: "))
+        print("\n Books: ")
+        print()
+
+
+        if role == "Admin":
+            #prints all header for admin
+            df = pd.read_csv(path)
+        elif role == "User":
+            #prints only the selected header for users
+            df = pd.read_csv(path, usecols= columns)
+
+        if user_input ==1:
+            print(df)
+        elif user_input ==2:
+            print(df.head(c))
+        elif user_input ==3:
+            print(df.tail(c))
+        elif user_input == 4:
+            exit()
+        else:
+            print("Select from the given options!!!")
+
+    except pd.errors.EmptyDataError:
+        print(f"\n {path} file is empty")
+
+    except Exception as e:
+        print(f"\n Undexpected error: {e}")
 
 def add_book():
     book_path = r"LibraryManagement\LibM1\books.csv"
@@ -170,12 +176,13 @@ def add_book():
 def del_book():
     book_path = r"LibraryManagement\LibM1\books.csv"
     file_exists = v.check_file_existance(book_path)
-    if file_exists:
+    while file_exists:
         try:
             choice = m.del_book_menu()
             df = pd.read_csv(book_path)
             if choice ==1:
-                del_id = int(input("\nBook ISBN to delete: "))
+                del_id = int(input("\nBook ID to delete: "))
+
                 if del_id not in df["B_ID"].values:
                     print (f"\nBook ID {del_id} does not exists!!!")
                 else:
@@ -187,14 +194,18 @@ def del_book():
                 del_isbn = int(input("\nBook ISBN to delete: "))
 
                 if del_isbn not in df["ISBN"].values:
-                        print (f"\nISBN {del_isbn} book does not exists!!!")
+                    print (f"\nISBN {del_isbn} book does not exists!!!")
                 else:
-                        df = df[df["ISBN"]!=del_isbn]
-                        df.to_csv(book_path, index= False)
-                        print(f"\nISBN {del_isbn} book deleted successfully")
-                    
+                    df = df[df["ISBN"]!=del_isbn]
+                    df.to_csv(book_path, index= False)
+                    print(f"\nISBN {del_isbn} book deleted successfully")
+
+            elif choice ==3:
+                exit()
+            else:
+                print("Select from the given options!!!")
             
         except ValueError as ve: 
-            print(f"Delete Value Error: {ve}")
+            print(f"\n Deleter User Data Type Error: {ve}")
         except Exception as e:
-            print(f"Delete Error: {e}")
+            print(f"\n Delete Error: {e}")

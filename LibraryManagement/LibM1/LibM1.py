@@ -1,9 +1,9 @@
-import csv ,os, validation as v
-
-
+import csv ,os, validation as v, menus
+import admin
+import hashlib
 
 def login():
-    print("\nQ or q to quit")
+    print("\n Q or q to quit")
     print("-------------- Login Page ----------------------")
     userdb_csv = r"LibraryManagement\LibM1\user_db.csv"
     file_exists = v.check_file_existance(userdb_csv)
@@ -34,11 +34,18 @@ def login():
                                 try:
                                     #if id found ask pw
                                     pw = input("Enter your password: ")
+                                    pw = hashlib.sha256(pw.encode()).hexdigest()
                                     #if row.get("Password")==pw
                                     if row['Password'] == pw:
                                         print("\nLogin\n")
+                                        if row["Role"] =="Admin":
+                                            menus.admin_dashboard()
+
+                                        role = row["Role"]
+                                        print("\n",role)
+                                        
                                         exit()
-                                            
+                                        
                                     else:
                                         print("\nIncorrect Password!!!")
                                         print(f"You have {i-1} tries left")
