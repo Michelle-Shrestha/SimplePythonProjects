@@ -8,8 +8,7 @@ def admin_dashboard():
     print("5. Search User ")
     print("6. Search Book ")
     print("7. Borrowed Book ")
-    print("8. Books Sold ")
-    print("9. Exit ") 
+    print("8. Exit ") 
 
 
 #----------------- Users------------------
@@ -22,11 +21,12 @@ def user_crud_menu():
 
 def edit_user():
     print("\n---- Edit -------")
-    print("1. User ID ")
-    print("2. Username ")
-    print("3. Role ")
-    print("4. Status ")
-    print("5. Exit")
+    print("1. Username ")
+    print("2. Role ")
+    print("3. Status ")
+    print("4. Password ")
+    print("5. View User Data")
+    print("6. Exit")
 
 def view_menu():
     print("\n--------- Search ---------")
@@ -49,15 +49,15 @@ def book_crud_menu():
 
 def edit_book():
     print("\n----------- Edit ----------")
-    print("1. Book ID ")
-    print("2. Title ")
-    print("3. ISBN ")
-    print("4. Author ")
-    print("5. Published Year ")
-    print("6. Description ")
-    print("7. Price ")
-    print("8. Total Quantity")
-    print("9. Available Quantity ")
+    print("1. Title ")
+    print("2. ISBN ")
+    print("3. Author ")
+    print("4. Published Year ")
+    print("5. Description ")
+    print("6. Price ")
+    print("7. Total Quantity")
+    print("8. Available Quantity ")
+    print("9. View Book Data")
     print("10. Exit")
 
 

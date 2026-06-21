@@ -20,7 +20,7 @@ def check_file_existance(path):
         return False
     return True
 
-
+              
 #--------------------------------------- BOTH ------------------------------------------------
 def valid_id(path, column, edit = False):
         try:
@@ -30,7 +30,11 @@ def valid_id(path, column, edit = False):
 
             if edit == True:
                 new_id = int(input("\nEdit the id: "))
-                return new_id
+                if not new_id:
+                    raise ValueError("Please enter a valid id!!!")
+                else:
+                    return new_id
+
 
             if file_exists:
                 with open (user_path, mode="r") as user_file:
@@ -58,27 +62,112 @@ def curr_date_time():
     curr = dt.now().strftime(r"%Y-%m-%d %a")
     return(curr)
 
+#if Q then breaks out from the loop
+def breaking(u_input):
+    if u_input.capitalize() == "Q":
+        print("\nGoing Back")
+        return False
+    else:
+        return True
+
+#to return the input as int or floating value 
 def int_check(u_input):
-    if u_input.isalpha() and u_input.upper()!= "Q":
+    if u_input.strip().isalpha() and u_input.upper()!= "Q":
         print(f"\n Invalid Input!!!")
     elif u_input.isdigit():
         return int(u_input)
-    
-def float_check(u_input):
-    if u_input.isalpha() and u_input.upper()!= "Q":
+
+def float_check(u_input): 
+    if u_input.strip().isalpha() and u_input.upper()!= "Q":
         print(f"\n Invalid Input!!!")
     elif u_input.isdigit():
         return float(u_input)
     
-def breaking(u_input):
-    if u_input.capitalize() == "Q":
-        print("Exiting")
-        return False
-    else:
-        return True
-        
+def check_uid_for_each(id_type):
+    if id_type == "U_ID":
+        id = input("\nEnter the user id to edit: ")
+        if not id:
+            raise ValueError("Please enter the user id!!!")
+    if id_type == "B_ID":
+        id = input("\nEnter the book id to edit: ")
+        if not id:
+            raise ValueError("Please enter the book id!!!")
+    if id:     
+        return id
 
+#validates whether id exists or not and returns it
+def check_uid(path, id_type, running = True):
+    while running:
+        try:
+            id = check_uid_for_each(id_type)
+            running = breaking(id)
+            id = int_check(id)
+            if id:
+                with open(path, mode="r") as read_files:
+                    id_read = csv.DictReader(read_files)
+                    id_found = False
+                    for row in id_read:
+                        if int(row[id_type]) ==id:
+                            id_found = True
+                    if id_found:
+                        return id
+                    else: 
+                        if id_type == "U_ID":
+                            print(f"\nUser ID {id} not found!!!")
+                        if id_type == "B_ID":
+                            print(f"\nBook ID {id} not found!!!")
+        except Exception as e:
+            print(f"\n ID error: {e}")  
 
+#Edit the cols (takes param: csv file, id header whether of book or col, uni id no, col header of changing variable, and the replacing val)
+def edit_value(file_path, id_type , id_no, column, new_val):
+    file_exists = check_file_existance(file_path)
+    if file_exists:
+        try:
+            with open(file_path, mode= "r") as read_file:
+                reader = csv.DictReader(read_file)
+                rows = []
+                field = reader.fieldnames #reading fields directly from file
+                #Checks whether the columns exists or not
+                if column not in field:
+                    raise ValueError (f"\nColumn {column} does not exist in CSV")
+                
+                for row in reader:
+                    if int(row[id_type])== id_no:
+                        if str(row[column])==str(new_val):
+                            print("\nThe new value is same as old ones!!!")
+                        else:
+                            if new_val == False:
+                                print("\nEnter Valid Input!!")
+                            elif new_val == None:
+                                None
+                            else:
+                                row[column] = new_val
+                                print(f"\nSuccessfully changed to new value {new_val}")
+                    rows.append(row)
+
+            with open(file_path, mode="w", newline="") as write_file:
+                writer = csv.DictWriter(write_file, fieldnames=field)
+                writer.writeheader()
+
+                for row in rows:
+                    writer.writerow(row)
+
+        except Exception as e:
+            print(f"Edit Error: {e}")  
+
+def view_row (path, id_type, id):
+    rows = []
+    with open (path, mode="r") as read_file:
+            reader = csv.DictReader(read_file)
+            for row in reader:
+                if int(row[id_type])== id:
+                    rows.append(row)
+    df = pd.DataFrame(rows)
+    if id_type == "U_ID":
+        fields =["U_ID", "Username","Role", "Status", "Created Date"] 
+        df = df[fields]
+    print(df.to_string(index=False))
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation For Users --------------------------------
 
@@ -98,6 +187,7 @@ def validate_username(edit = False, running = True):
                 if not username:
                     raise ValueError("Username cannot be empty!!!")
                 running = breaking(username)
+                #is not necessary
                 for row in u_read:
                     if row["Username"].title() ==username:
                         found = True
@@ -107,7 +197,6 @@ def validate_username(edit = False, running = True):
                 return username
         except Exception as e:
             print(f"\n Username error: {e}")
-
 
 def valid_role(edit= False):
     print("\nRoles:")
@@ -131,16 +220,20 @@ def valid_role(edit= False):
                 print("\n Please select a role from the given option")
             
         except ValueError as ve:
-            print(f"\n Role Error: {ve}")
-  
+            print(f"\n Role Error: {ve}") 
 
-def validate_password(running = True):
+def validate_password(edit = False, running = True):
     while running:
         try:
-            pw = input("\nEnter the new password: ")
+            if edit == True:
+                pw = input("\nEdit the Password: ")
+            else:
+                pw = input("\nEnter the new password: ")
             if not pw:
                 raise ValueError("Please enter password")
             running = breaking(pw) # to forcefully exit
+
+
             if pw and pw.upper()!="Q":
                 c_pw = input("\nRe enter to confirm the password: ")
                 breaking(c_pw)
@@ -157,7 +250,6 @@ def validate_password(running = True):
 
         except Exception as e:
             print(f"\n Password Error: {e}")
-
 
 def valid_status(edit= False):
     print("\nStatus:")
@@ -184,28 +276,35 @@ def valid_status(edit= False):
             print(f"\n Status Error: {ve}")
 
 #------------------- User Edit Feature 
-def edit_uid(path, header, column, uid):
-    new_id= []
-    with open (path, mode= "r") as r_files:
-        read = csv.DictReader(r_files)
-        for row in read:
-            if int(row[column]) == uid:
-                edited = valid_id(path, column, edit = True)
-                row["U_ID"]= edited
-                new_id.append(row)
-    return new_id
+def edit_username(user_path, id_type, id):
+    new_un = validate_username(edit=True)
+    col = "Username"
+    edit_value(user_path, id_type, id, col, new_un )
 
-                
+def edit_role(user_path, id_type, id):
+    new_un = valid_role(edit=True)
+    col = "Role"
+    edit_value(user_path, id_type, id, col, new_un )
+
+def edit_status(user_path, id_type, id):
+    new_un = valid_status(edit=True)
+    col = "Status"
+    edit_value(user_path, id_type, id, col, new_un )
+
+def edit_password(user_path, id_type, id):
+    new_pw = validate_password(edit=True)
+    col = "Status"
+    edit_value(user_path, id_type, id, col, new_pw )
 
 #path = r"LibraryManagement\LibM1\user_db.csv"
 #header = ["U_ID", "Username","Role", "Password", "Status", "Created Date"]
 #column = "U_ID"
+#edit_status(path, column, 1003)
 #a=  edit_uid(path,header, column, 1001)
 #print(a)
 
 
-#------------------ User Search feature
-
+#------)------------ User Search feature
 
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation for Books --------------------------------
@@ -227,10 +326,9 @@ def validate_title(edit= False,running = True):
                 raise ValueError("Please enter the book title!!!")
             
         except Exception as e:
-            print(f"\n Error is {e}")
+            print(f"\n Error: {e}")
 
-
-def enter_isbn(edit= False, running = True):
+def enter_isbn(edit, running = True):
     while running:
         try:
             if edit == True:
@@ -242,24 +340,23 @@ def enter_isbn(edit= False, running = True):
                 raise ValueError ("Please enter the books ISBN !!!")
   
             running=breaking(isbn)
-
-            if isbn.isdigit() and length!= 13:
-                print("\n Invalid ISBN length")
-
             isbn = int_check(isbn) #returns the input as int datatype
             if isbn:
-                return isbn
+                if length!= 13:
+                    print("\n Invalid ISBN length")    
+                else:
+                    return isbn
 
         except Exception as e:
             print(f"\n ISBN Error: {e}")
 
-def validate_isbn():
+def validate_isbn(edit = False):
     book_path = r"LibraryManagement\LibM1\books.csv"
     file_exists = check_file_existance(book_path)
     if file_exists:
         
             try:
-                isbn = enter_isbn()
+                isbn = enter_isbn(edit)
                 with open(book_path, mode="r", newline="") as book_file:
                     read = csv.DictReader(book_file)
                     found = False
@@ -267,17 +364,14 @@ def validate_isbn():
                         if row["ISBN"] == isbn: #checking if there's already the same isbn
                             print(f"\n Given isbn book already exists!!!")
                             found = True
-                            break
-                            
+                            break   
                     if not found:   
                         return(isbn)
 
-            
             except Exception as e:
-                print(f"\n Error is {e}")
+                print(f"\n Error: {e}")
 
-
-def validate_auhor(title, edit = False):
+def validate_author(title, edit = False):
         try:
             if edit == True:
                 author = input(f"\nEdit the book \"{title}\" Author name: ").strip().title()
@@ -290,7 +384,7 @@ def validate_auhor(title, edit = False):
                 return "Unknown Author"
             return author
         except Exception as e:
-            print(f"\n Error is {e}")
+            print(f"\n Error: {e}")
 
 def validate_year(title, edit = False, running = True):
     while running:
@@ -318,7 +412,22 @@ def validate_year(title, edit = False, running = True):
         except Exception as e:
             print(f"\n Year error: {e}")
 
-            
+def validate_description(title, edit = False):
+        try:
+            if edit == True:
+                description = input(f"\nEdit the book \n\"{title}\" description: ").strip().capitalize()
+            else:
+                description = input(f"\n\"{title}\" Book Description: ").strip().capitalize()
+
+            breaking(description)
+
+            if not description:
+                return "Description not available"
+            else:
+                return description
+        except Exception as e:
+            print(f"\n Error: {e}")
+
 def validate_price(title, curr_s = "NRS", edit = False, running=True):
     while running:
         max_price = 1000000
@@ -348,7 +457,6 @@ def validate_price(title, curr_s = "NRS", edit = False, running=True):
         except Exception as e:
             print(f"\n Price error: {e}!!!")
 
-
 def validate_total_qty(edit= False, running = True):
     while running:
         max_qty = 150
@@ -373,9 +481,7 @@ def validate_total_qty(edit= False, running = True):
                     return qty
 
         except Exception as e:
-            print(f"\n Error is {e}")
-
-
+            print(f"\n Error: {e}")
 
 def validate_available_qty(t_qty, edit = False, running = True):
     while running:
@@ -402,25 +508,54 @@ def validate_available_qty(t_qty, edit = False, running = True):
                     return qty
             
         except Exception as e:
-            print(f"\n Error is {e}")
-
-
-def validate_description(title, edit = False):
-        try:
-            if edit == True:
-                description = input(f"\nEdit the book \n\"{title}\" description: ").strip().capitalize()
-            else:
-                description = input(f"\n\"{title}\" Book Description: ").strip().capitalize()
-
-            breaking(description)
-
-            if not description:
-                return "Description not available"
-            return description
-        except Exception as e:
-            print(f"\n Error is {e}")
+            print(f"\n Error: {e}")
 
 #------------------- Book Edit Feature 
 
-#------------------ Book Search feature
+def edit_title(book_path, id_type, id):
+    new_un = validate_title(edit=True)
+    col = "Title"
+    edit_value(book_path, id_type, id, col, new_un )
 
+def edit_isbn(book_path, id_type, id):
+    new_isbn = validate_isbn(edit=True)
+    col = "ISBN"
+    edit_value(book_path, id_type, id, col, new_isbn )
+
+def edit_author(book_path, id_type, id,title):
+    new_author= validate_author(title=title, edit=True)
+    col = "Author"
+    edit_value(book_path, id_type, id, col, new_author )
+
+def edit_pyear(book_path, id_type, id,title):
+    new_pub_year= validate_year(title=title, edit=True)
+    col = "Published Year"
+    edit_value(book_path, id_type, id, col, new_pub_year )
+
+def edit_description(book_path, id_type, id,title):
+    new_description= validate_description(title=title, edit=True)
+    col = "Description"
+    edit_value(book_path, id_type, id, col, new_description )
+
+def edit_price(book_path, id_type, id,title):
+    new_price= validate_price(title=title, edit=True)
+    col = "Price NRS"
+    edit_value(book_path, id_type, id, col, new_price )
+
+def edit_t_qty(book_path, id_type, id):
+    new_t_qty= validate_total_qty(edit=True)
+    col = "Total Qty"
+    edit_value(book_path, id_type, id, col, new_t_qty )
+
+def edit_a_qty(book_path, id_type, id,t_qty):
+    new_a_qty= validate_available_qty(t_qty,edit=True)
+    col = "Available Qty"
+    edit_value(book_path, id_type, id, col, new_a_qty )
+
+
+#path = r"LibraryManagement\LibM1\books.csv"
+#column = "B_ID"
+#edit_price(path, column,3,"HEHE")
+
+
+#------------------ Book Search feature
