@@ -143,7 +143,7 @@ def edit_value(file_path, id_type , id_no, column, new_val):
                                 None
                             else:
                                 row[column] = new_val
-                                print(f"\nSuccessfully changed to new value {new_val}")
+                                print(f"\nSuccessfully changed to new value \"{new_val}\" ")
                     rows.append(row)
 
             with open(file_path, mode="w", newline="") as write_file:

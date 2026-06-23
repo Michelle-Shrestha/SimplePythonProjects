@@ -1,23 +1,25 @@
 # MAIN admin Menu
 def admin_dashboard(): 
     print ("\n------ Admin Dashboard ------------")
-    print("1. Books List ")
-    print("2. User Database ")
+    print("1. User Database ")
+    print("2. Books List ")
     print("3. User Sub Menu ")
     print("4. Book Sub Menu ")
     print("5. Search User ")
     print("6. Search Book ")
     print("7. Borrowed Book ")
     print("8. Exit ") 
+    print("----------------------------------\n")
 
 
 #----------------- Users------------------
 def user_crud_menu():
-    print("\n----------------")
-    print("1. Add User ")
-    print("2. Edit User ")
-    print("3. Delete User ")
-    print("4. Exit ")
+    print("\n-----USER CRUD OPERATION-----")
+    print("      1. Add User ")
+    print("      2. Edit User ")
+    print("      3. Delete User ")
+    print("      4. Exit ")
+    print("----------------------------\n")
 
 def edit_user():
     print("\n---- Edit -------")
@@ -27,6 +29,7 @@ def edit_user():
     print("4. Password ")
     print("5. View User Data")
     print("6. Exit")
+    print("----------------\n")
 
 def view_menu():
     print("\n--------- Search ---------")
@@ -36,16 +39,18 @@ def view_menu():
     print("4. Created Date ")
     print("5. Status ")
     print("6. Exit")
+    print("--------------------------\n")
     
 
 
 #--------------- BOOKS ---------------
 def book_crud_menu():
-    print("\n----------------")
-    print("1. Add Book ")
-    print("2. Edit Book ")
-    print("3. Delete Book ")
-    print("4. Exit")
+    print("\n-----BOOK CRUD OPERATIONS-----")
+    print("      1. Add Book ")
+    print("      2. Edit Book ")
+    print("      3. Delete Book ")
+    print("      4. Exit")
+    print("-----------------------------\n")
 
 def edit_book():
     print("\n----------- Edit ----------")
@@ -59,6 +64,7 @@ def edit_book():
     print("8. Available Quantity ")
     print("9. View Book Data")
     print("10. Exit")
+    print("-------------------------\n")
 
 
 def search_book_menu(role):
@@ -76,6 +82,7 @@ def search_book_menu(role):
         print("10. Exit ")
     if role == "User":
         print("8. Exit ")
+    print("-----------------------\n")
 
 def del_book_menu():
     try:
@@ -83,6 +90,7 @@ def del_book_menu():
         print("1. Delete by ID")
         print("2. Delete by ISBN")
         print("3. Exit")
+        print("-----------------\n")
 
         choice = int(input("\nChoose Option: "))
         if choice:

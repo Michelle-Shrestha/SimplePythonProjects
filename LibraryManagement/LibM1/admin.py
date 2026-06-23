@@ -2,33 +2,36 @@ import os, csv, pandas as pd
 import validation as v, menus as m #importing local py files
 
 
-def user_details():
+def user_details(running= True):
     path = r"LibraryManagement\LibM1\user_db.csv"
     c = 10
-    print("\n1. To View first All User")
-    print(f"2. To View first {c} users")
-    print(f"3. To View Last {c} user")
-    
-    try:
-        user_input = int(input("\nEnter your choice: "))
-        v.breaking(user_input)
-        print("\n Users: ")
-        print()
+    while running:
+        print("\n1. To View first All User")
+        print(f"2. To View first {c} users")
+        print(f"3. To View Last {c} user")
+        print(f"4. Exit")
         
-        df = pd.read_csv(path)
-        if user_input ==1:
-            print(pd.DataFrame(df))
-        elif user_input ==2:
-            print(df.head(c))
-        elif user_input ==3:
-            print(df.tail(c))
-        else:
-            print("Select from the given options!!!")
-    except pd.errors.EmptyDataError:
-        print(f"\n {path} file is empty")
+        try:
+            user_input = int(input("\nEnter your choice: "))
+            print("\n Users: ")
+            print()
+            
+            df = pd.read_csv(path)
+            if user_input ==1:
+                print(pd.DataFrame(df))
+            elif user_input ==2:
+                print(df.head(c))
+            elif user_input ==3:
+                print(df.tail(c))
+            elif user_input==4:
+                break
+            else:
+                print("Select from the given options!!!")
+        except pd.errors.EmptyDataError:
+            print(f"\n {path} file is empty")
 
-    except Exception as e:
-        print(f"\n Undexpected error: {e}")
+        except Exception as e:
+            print(f"\n Undexpected error: {e}")
 
 
 def add_user():
@@ -150,44 +153,45 @@ def user_crud(u_running = True):
 
 # ------------------------------------------------------------------ Book ------------------------------------------------------------------------------------
 
-def book_details(role):
+def book_details(role="User", running=True):
     path = r"LibraryManagement\LibM1\books.csv"
-    try: 
-        columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
-        c = 20
-        print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
-        print(f"2. To View first {c} Books")
-        print(f"3. To View Last {c} Books")
-        print("4. Exit ")
-        
-        user_input = int(input("\nEnter your choice: "))
-        print("\n Books: ")
-        print()
+    while running:
+        try: 
+            columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
+            c = 20
+            print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
+            print(f"2. To View first {c} Books")
+            print(f"3. To View Last {c} Books")
+            print("4. Exit ")
+            
+            user_input = int(input("\nEnter your choice: "))
+            print("\n Books: ")
+            print()
 
 
-        if role == "Admin":
-            #prints all header for admin
-            df = pd.read_csv(path)
-        elif role == "User":
-            #prints only the selected header for users
-            df = pd.read_csv(path, usecols= columns)
+            if role == "Admin":
+                #prints all header for admin
+                df = pd.read_csv(path)
+            elif role == "User":
+                #prints only the selected header for users
+                df = pd.read_csv(path, usecols= columns)
 
-        if user_input ==1:
-            print(df)
-        elif user_input ==2:
-            print(df.head(c))
-        elif user_input ==3:
-            print(df.tail(c))
-        elif user_input == 4:
-            exit()
-        else:
-            print("Select from the given options!!!")
+            if user_input ==1:
+                print(df)
+            elif user_input ==2:
+                print(df.head(c))
+            elif user_input ==3:
+                print(df.tail(c))
+            elif user_input == 4:
+                break
+            else:
+                print("Select from the given options!!!")
 
-    except pd.errors.EmptyDataError:
-        print(f"\n {path} file is empty")
+        except pd.errors.EmptyDataError:
+            print(f"\n {path} file is empty")
 
-    except Exception as e:
-        print(f"\n Undexpected error: {e}")
+        except Exception as e:
+            print(f"\n Undexpected error: {e}")
 
 def add_book():
     book_path = r"LibraryManagement\LibM1\books.csv"
@@ -266,7 +270,7 @@ def delete_book(m_runninng =True):
                         print(f"\nISBN {del_isbn} book deleted successfully")
 
                 elif choice ==3:
-                    exit()
+                    break
                 else:
                     print("Select from the given options!!!")
                 
@@ -341,4 +345,30 @@ def book_crud(u_running = True):
 
         except Exception as e:
             print(f"\n Book CRUD Error: {e}")
-book_crud()
+
+def main_func(role="Admin",is_running = True):
+    while is_running:
+        try:
+            m.admin_dashboard()
+            user_choice = int(input("Enter your choice: "))
+            if user_choice==1:
+                user_details()
+
+            elif user_choice==2:
+                book_details(role)
+
+            elif user_choice==3:
+                user_crud()
+
+            elif user_choice==4:
+                book_crud()
+
+            elif user_choice==8:
+                print("\nThank you for using <3")
+                break
+            else:
+                print("Please Select from the given Options!!!")
+
+        except Exception as e:
+            print(f"ERROR: {e}")
+main_func()
