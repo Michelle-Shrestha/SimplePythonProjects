@@ -2,40 +2,39 @@ import os, csv, pandas as pd
 import validation as v, menus as m #importing local py files
 
 
-def user_details(running= True):
-    path = r"LibraryManagement\LibM1\user_db.csv"
+def user_details(user_path,running= True):
+    file_exists = v.check_file_existance(user_path)
     c = 10
-    while running:
-        print("\n1. To View first All User")
-        print(f"2. To View first {c} users")
-        print(f"3. To View Last {c} user")
-        print(f"4. Exit")
-        
-        try:
-            user_input = int(input("\nEnter your choice: "))
-            print("\n Users: ")
-            print()
+    if file_exists:
+        while running:
+            print("\n1. To View first All User")
+            print(f"3. To View Last {c} user")
+            print(f"4. Exit")
             
-            df = pd.read_csv(path)
-            if user_input ==1:
-                print(pd.DataFrame(df))
-            elif user_input ==2:
-                print(df.head(c))
-            elif user_input ==3:
-                print(df.tail(c))
-            elif user_input==4:
-                break
-            else:
-                print("Select from the given options!!!")
-        except pd.errors.EmptyDataError:
-            print(f"\n {path} file is empty")
+            try:
+                user_input = int(input("\nEnter your choice: "))
+                print("\n Users: ")
+                print()
+                
+                df = pd.read_csv(user_path)
+                if user_input ==1:
+                    print(pd.DataFrame(df))
+                elif user_input ==2:
+                    print(df.head(c))
+                elif user_input ==3:
+                    print(df.tail(c))
+                elif user_input==4:
+                    break
+                else:
+                    print("Select from the given options!!!")
+            except pd.errors.EmptyDataError:
+                print(f"\n {user_path} file is empty")
 
-        except Exception as e:
-            print(f"\n Undexpected error: {e}")
+            except Exception as e:
+                print(f"\n Undexpected error: {e}")
 
 
-def add_user():
-    user_path = r"LibraryManagement\LibM1\user_db.csv"
+def add_user(user_path):
     file_exists = v.check_file_existance(user_path)
     fields = ["U_ID", "Username","Role", "Password", "Status", "Created Date"]
     if not file_exists:
@@ -72,8 +71,7 @@ def add_user():
             else: 
                 print("Please enter Y to be sure")
          
-def delete_users(m_running = True):
-    user_path = r"LibraryManagement\LibM1\user_db.csv"
+def delete_users(user_path, m_running = True):
     file_exists = v.check_file_existance(user_path)
     if file_exists:
         while  m_running:
@@ -99,8 +97,7 @@ def delete_users(m_running = True):
                 except Exception as e:
                     print(f"\n Delete User Error: {e}")
 
-def edit_users(m_running = True):
-    user_path = r"LibraryManagement\LibM1\user_db.csv"
+def edit_users(user_path, m_running = True):
     file_exists = v.check_file_existance(user_path)
     if file_exists:
         id_type_Header = "U_ID"
@@ -132,17 +129,17 @@ def edit_users(m_running = True):
                 except Exception as e:
                     print(f"\n Edit User Error: {e}")
 
-def user_crud(u_running = True):
-    while u_running:
+def user_crud(user_path, m_running = True):
+    while m_running:
         try:
             m.user_crud_menu()
             user_input = int(input("\nEnter your choice: "))
             if user_input ==1:
-                add_user()
+                add_user(user_path)
             elif user_input==2:
-                edit_users()
+                edit_users(user_path)
             elif user_input ==3:
-                delete_users()
+                delete_users(user_path)
             elif user_input ==4:
                 break
             else:
@@ -151,50 +148,70 @@ def user_crud(u_running = True):
         except Exception as e:
             print(f"\n User CRUD Error: {e}")
 
+def user_search(user_path, m_running= True):
+    file_exists = v.check_file_existance(user_path)
+    id_header = "U_ID"
+    if file_exists:
+        while m_running:
+            try:
+                m.search_user_menu()
+                user_input = int(input("\nEnter your choice: "))
+                if user_input ==1:
+                    v.by_id(user_path, id_header)
+                elif user_input==2:
+                    print("HEHE")
+                elif user_input ==6:
+                    break
+                else:
+                    print("\nSelect from the given option")
+
+            except Exception as e:
+                print(f"\n Search Error: {e}")
+
 # ------------------------------------------------------------------ Book ------------------------------------------------------------------------------------
 
-def book_details(role="User", running=True):
-    path = r"LibraryManagement\LibM1\books.csv"
-    while running:
-        try: 
-            columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
-            c = 20
-            print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
-            print(f"2. To View first {c} Books")
-            print(f"3. To View Last {c} Books")
-            print("4. Exit ")
-            
-            user_input = int(input("\nEnter your choice: "))
-            print("\n Books: ")
-            print()
+def book_details(path,role="User", running=True):
+    file_exists = v.check_file_existance(path)
+    if file_exists:
+        while running:
+            try: 
+                columns = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS',  'Available Qty']
+                c = 20
+                print("\n1. To View first All Books") #idea: Make sorting here by alphabetically , price...
+                print(f"2. To View first {c} Books")
+                print(f"3. To View Last {c} Books")
+                print("4. Exit ")
+                
+                user_input = int(input("\nEnter your choice: "))
+                print("\n Books: ")
+                print()
 
 
-            if role == "Admin":
-                #prints all header for admin
-                df = pd.read_csv(path)
-            elif role == "User":
-                #prints only the selected header for users
-                df = pd.read_csv(path, usecols= columns)
+                if role == "Admin":
+                    #prints all header for admin
+                    df = pd.read_csv(path)
+                elif role == "User":
+                    #prints only the selected header for users
+                    df = pd.read_csv(path, usecols= columns)
 
-            if user_input ==1:
-                print(df)
-            elif user_input ==2:
-                print(df.head(c))
-            elif user_input ==3:
-                print(df.tail(c))
-            elif user_input == 4:
-                break
-            else:
-                print("Select from the given options!!!")
+                if user_input ==1:
+                    print(df)
+                elif user_input ==2:
+                    print(df.head(c))
+                elif user_input ==3:
+                    print(df.tail(c))
+                elif user_input == 4:
+                    break
+                else:
+                    print("Select from the given options!!!")
 
-        except pd.errors.EmptyDataError:
-            print(f"\n {path} file is empty")
+            except pd.errors.EmptyDataError:
+                print(f"\n {path} file is empty")
 
-        except Exception as e:
-            print(f"\n Undexpected error: {e}")
+            except Exception as e:
+                print(f"\n Undexpected error: {e}")
 
-def add_book():
-    book_path = r"LibraryManagement\LibM1\books.csv"
+def add_book(book_path):
     file_exists = v.check_file_existance(book_path)
     fields = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS', 'Total Qty', 'Available Qty', "Inclusion Date"]
     
@@ -241,8 +258,7 @@ def add_book():
                     except Exception as e:
                         print(f"\n Adding Book Error: {e}")
 
-def delete_book(m_runninng =True):
-    book_path = r"LibraryManagement\LibM1\books.csv"
+def delete_book(book_path, m_runninng =True):
     file_exists = v.check_file_existance(book_path)
     if file_exists:
         while m_runninng:
@@ -279,8 +295,7 @@ def delete_book(m_runninng =True):
             except Exception as e:
                 print(f"\n Delete Error: {e}")
 
-def edit_books():
-    book_path = r"LibraryManagement\LibM1\books.csv"
+def edit_books(book_path):
     file_exists = v.check_file_existance(book_path)
 
     if file_exists:
@@ -327,17 +342,18 @@ def edit_books():
                     print(f"\n Edit User Value Error: {ve}")
                 except Exception as e:
                     print(f"\n Edit User Error: {e}")
-def book_crud(u_running = True):
+
+def book_crud(book_path, u_running = True):
     while u_running:
         try:
             m.book_crud_menu()
             user_input = int(input("\nEnter your choice: "))
             if user_input ==1:
-                add_book()
+                add_book(book_path)
             elif user_input==2:
-                edit_books()
+                edit_books(book_path)
             elif user_input ==3:
-                delete_book()
+                delete_book(book_path)
             elif user_input ==4:
                 break
             else:
@@ -346,22 +362,46 @@ def book_crud(u_running = True):
         except Exception as e:
             print(f"\n Book CRUD Error: {e}")
 
+def book_search(book_path, m_running= True):
+    file_exists = v.check_file_existance(book_path)
+    id_header = "B_ID"
+    if file_exists:
+        while m_running:
+            try:
+                m.search_book_menu(role ="Admin")
+                user_input = int(input("\nEnter your choice: "))
+                if user_input ==1:
+                    v.by_id(book_path, id_header)
+                elif user_input==2:
+                    print("HEHE")
+                elif user_input ==6:
+                    break
+                else:
+                    print("\nSelect from the given option")
+
+            except Exception as e:
+                print(f"\n Search Error: {e}")
+path = r"LibraryManagement\LibM1\books.csv"
+book_search(path)
+
 def main_func(role="Admin",is_running = True):
+    book_path = r"LibraryManagement\LibM1\books.csv"
+    user_path = r"LibraryManagement\LibM1\user_db.csv"
     while is_running:
         try:
             m.admin_dashboard()
             user_choice = int(input("Enter your choice: "))
             if user_choice==1:
-                user_details()
+                user_details(user_path)
 
             elif user_choice==2:
-                book_details(role)
+                book_details(book_path, role)
 
             elif user_choice==3:
-                user_crud()
+                user_crud(user_path)
 
             elif user_choice==4:
-                book_crud()
+                book_crud(book_path)
 
             elif user_choice==8:
                 print("\nThank you for using <3")
@@ -371,4 +411,3 @@ def main_func(role="Admin",is_running = True):
 
         except Exception as e:
             print(f"ERROR: {e}")
-main_func()

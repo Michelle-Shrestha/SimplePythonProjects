@@ -83,13 +83,19 @@ def float_check(u_input):
     elif u_input.isdigit():
         return float(u_input)
     
-def check_uid_for_each(id_type):
+def check_uid_for_each(id_type, search = False):
     if id_type == "U_ID":
-        id = input("\nEnter the user id to edit: ")
+        if search==True:
+            id = input("\nEnter the User ID to search: ").capitalize()
+        else:
+            id = input("\nEnter the user id to edit: ").capitalize()
         if not id:
             raise ValueError("Please enter the user id!!!")
     if id_type == "B_ID":
-        id = input("\nEnter the book id to edit: ")
+        if search==True:
+            id = input("\nEnter the Book ID to search: ").capitalize()
+        else:
+            id = input("\nEnter the book id to edit: ").capitalize()
         if not id:
             raise ValueError("Please enter the book id!!!")
     if id:     
@@ -168,6 +174,45 @@ def view_row (path, id_type, id):
         fields =["U_ID", "Username","Role", "Status", "Created Date"] 
         df = df[fields]
     print(df.to_string(index=False))
+
+#for search 
+def by_id(path, col_header, running= True):
+    file_exists = check_file_existance(path)
+    if file_exists:
+        while running:
+            rows=[]
+            found  = False
+            try: 
+                search_id =check_uid_for_each(col_header, search=True)
+                running = breaking(search_id)
+                search_id = int_check(search_id)
+
+                if search_id:
+                    with open (path, mode = "r") as read_file:
+                        reading = csv.DictReader(read_file)
+
+                        for read in reading:
+                            if int(read[col_header])==search_id:
+                                rows.append(read)
+                                found = True
+
+                        if not found:
+                            if col_header == "U_ID":
+                                print(f"User ID {search_id} not found!!!")
+                            elif col_header =="B_ID":
+                                print(f"Book ID {search_id} not found!!!")
+
+            except Exception as e:
+                print(f"\n Search ID Error: {e}")
+            if found:
+                df = pd.DataFrame(rows)
+                if col_header == "U_ID":
+                    fields =["U_ID", "Username","Role", "Status", "Created Date"]
+                    df = df[fields]
+                    print(df.to_string())
+                else:
+                    print(df.to_string())
+
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation For Users --------------------------------
 
@@ -305,6 +350,8 @@ def edit_password(user_path, id_type, id):
 
 
 #------)------------ User Search feature
+
+
 
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation for Books --------------------------------
