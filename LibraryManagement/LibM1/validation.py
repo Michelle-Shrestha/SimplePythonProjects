@@ -252,7 +252,7 @@ def search_result (user_path, header,  search_value):
             if search_value:
                 reading = csv.DictReader(read_files)
                 for read in reading:
-                    if read[header]== search_value:
+                    if str(read[header])== str(search_value):
                         rows.append(read)
                         found = True
             #if not found and search_value.upper()!="Q":
@@ -716,9 +716,127 @@ def edit_a_qty(book_path, id_type, id,t_qty):
     edit_value(book_path, id_type, id, col, new_a_qty )
 
 
-#path = r"LibraryManagement\LibM1\books.csv"
-#column = "B_ID"
-#edit_price(path, column,3,"HEHE")
 
 
 #------------------ Book Search feature
+def by_title(book_path,col_header,field, searching= True):
+    file_exists = check_file_existance(book_path)
+    if file_exists:
+        while searching:
+            try:
+                title = input("\nEnter the title to search: ").title()
+                searching = breaking(title)
+                if not title:
+                    raise ValueError("Please do not leave the title empty to search!!!")
+                if title and title!="Q":
+                    result = search_result(book_path, col_header, title)
+                    if result:
+                        print(f" \"{title}\" result:\n ")
+                        df = pd.DataFrame(result)
+                        df= df[field]
+                        print(df.to_string())
+                    if not result:
+                        print(f"\nTitle: {title} not found")
+
+                
+            except Exception as e:
+                print(f"\n Title Search Error: {e}")
+
+
+def by_isbn(book_path, col_header, field, searching = True):
+    file_exists = check_file_existance(book_path)
+    if file_exists:
+        while searching:
+            try:
+                isbn = input("\nEnter the isbn to search: ").title()
+                searching = breaking(isbn)
+                if not isbn:
+                    raise ValueError("Please do not leave the isbn empty!!!")
+                if len(isbn)!=13:
+                    raise ValueError("Invalid ISBN Length!!!")
+                isbn  = int_check(isbn)
+                if isbn:
+                    result = search_result(book_path, col_header, isbn)
+                    if result:
+                        print(f"\nISBN {isbn} result: \n")
+                        df = pd.DataFrame(result)
+                        df=df[field] 
+                        print(df.to_string())
+                    if not result:
+                        print(f"\nISBN: {isbn} not found!!!")
+
+            except Exception as e:
+                print(f"\n ISBN Search Error: {e}")
+
+def by_isbn(book_path, col_header, field, searching = True):
+    file_exists = check_file_existance(book_path)
+    if file_exists:
+        while searching:
+            try:
+                author = input("\nEnter the author name to search: ").title()
+                searching = breaking(author)
+                if not author:
+                    raise ValueError("Please do not leave the author name empty!!!")
+
+                if author:
+                    result = search_result(book_path, col_header, author)
+                    if result:
+                        print(f"\nAuthor {author} result: \n")
+                        df = pd.DataFrame(result)
+                        df=df[field] 
+                        print(df.to_string())
+                    if not result:
+                        print(f"\nAuthor: {author} not found!!!")
+
+            except Exception as e:
+                print(f"\nAuthor Search Error: {e}")
+
+def by_publishedY(book_path, col_header, field, searching = True):
+    file_exists = check_file_existance(book_path)
+    if file_exists:
+        while searching:
+            try:
+                publishedY = input("\nEnter the isbn to search: ").title()
+                searching = breaking(publishedY)
+                if not publishedY:
+                    raise ValueError("Please do not leave the year empty!!!")
+                if len(publishedY)!=4:
+                    raise ValueError("Invalid year Length!!!")
+                publishedY  = int_check(publishedY)
+                if publishedY:
+                    result = search_result(book_path, col_header, publishedY)
+                    if result:
+                        print(f"\nBooks on Published Year {publishedY} result: \n")
+                        df = pd.DataFrame(result)
+                        df=df[field] 
+                        print(df.to_string())
+                    if not result:
+                        print(f"\n Books onPublished Year: {publishedY} not found!!!")
+
+            except Exception as e:
+                print(f"\n Published Year Search Error: {e}")
+
+def by_price(book_path, col_header, field, searching=True):
+    file_exists = check_file_existance(book_path)
+    if file_exists:
+        while searching:
+            try:
+                price = input("\nEnter the price to search: ").title()
+                searching = breaking(price)
+                if not price:
+                    raise ValueError("Please do not leave the price empty!!!")
+                price  = float_check(price)
+                if price:
+                    result = search_result(book_path, col_header, price)
+                    if result:
+                        print(f"\nBooks of price: {price} result: \n")
+                        df = pd.DataFrame(result)
+                        df=df[field] 
+                        print(df.to_string())
+                    if not result:
+                        print(f"\n Books of Price: {price} not found!!!")
+
+            except Exception as e:
+                print(f"\n Price  Search Error: {e}")
+
+# ------------------ Borrow Book

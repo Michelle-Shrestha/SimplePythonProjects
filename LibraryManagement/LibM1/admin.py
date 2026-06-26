@@ -380,7 +380,14 @@ def book_crud(book_path, u_running = True):
 def book_search(book_path, m_running= True):
     file_exists = v.check_file_existance(book_path)
     id_header = "B_ID"
+    title_header= "Title"
+    isbn_header= "ISBN"
+    author_header = "Author"
+    published_year_header = "Published Year"
+    price_header = "Price NRS"
+
     included_date_header = "Inclusion Date"
+    fields = ['B_ID', 'Title', 'ISBN', 'Author', 'Published Year', 'Description', 'Price NRS', 'Total Qty', 'Available Qty', "Inclusion Date"]
     if file_exists:
         while m_running:
             try:
@@ -389,7 +396,15 @@ def book_search(book_path, m_running= True):
                 if user_input ==1:
                     v.by_id(book_path, id_header)
                 elif user_input==2:
-                    print("HEHE")
+                    v.by_title(book_path, title_header, fields)
+                elif user_input==3:
+                    v.by_isbn(book_path, isbn_header, fields)
+                elif user_input==4:
+                    v.by_isbn(book_path, author_header, fields)
+                elif user_input==5:
+                    v.by_publishedY(book_path, published_year_header, fields)
+                elif user_input==6:
+                    v.by_price(book_path, price_header, fields)
                 elif user_input==7:
                     v.by_created_date(book_path, included_date_header, id_header)
                 elif user_input ==8:
