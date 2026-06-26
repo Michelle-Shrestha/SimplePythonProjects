@@ -59,7 +59,7 @@ def valid_id(path, column, edit = False):
 
 
 def curr_date_time():
-    curr = dt.now().strftime(r"%Y-%m-%d %a")
+    curr = dt.now().strftime(r"%Y-%m-%d")
     return(curr)
 
 #if Q then breaks out from the loop
@@ -198,20 +198,70 @@ def by_id(path, col_header, running= True):
 
                         if not found:
                             if col_header == "U_ID":
-                                print(f"User ID {search_id} not found!!!")
+                                print(f"\nUser ID {search_id} not found!!!")
                             elif col_header =="B_ID":
-                                print(f"Book ID {search_id} not found!!!")
+                                print(f"\nBook ID {search_id} not found!!!")
 
             except Exception as e:
                 print(f"\n Search ID Error: {e}")
             if found:
                 df = pd.DataFrame(rows)
                 if col_header == "U_ID":
+                    print(f"\nUser ID {search_id}: \n")
                     fields =["U_ID", "Username","Role", "Status", "Created Date"]
                     df = df[fields]
                     print(df.to_string())
-                else:
+                elif col_header =="B_ID":
+                    print(f"\nBook ID {search_id}: \n")
                     print(df.to_string())
+
+def by_created_date(path, header, id_header, running = True):
+    file_exists = check_file_existance(path)
+    if file_exists:
+        while running:
+            try:
+                search_date = input("\nEnter the search date in %Y-%m-%d format separated by space: ").split(" ")
+                search_date = "-".join(search_date)
+                if not search_date:
+                    raise ValueError("Please dont leave it empty!!!")
+                running = breaking(search_date)
+                if search_date and search_date!="Q":
+                    result = search_result(path, header, search_date)
+                    if result:
+                        df = pd.DataFrame(result)
+                        if id_header =="U_ID":
+                            fields =["U_ID", "Username","Role", "Status", "Created Date"]
+                            df=df[fields]
+
+                            print(f"\nUser's Created in {search_date}: \n")
+                            print(df.to_string())
+
+                        elif id_header=="B_ID":
+                            print(f"\nBooks Created in {search_date}: \n")
+                            print(df.to_string()) 
+
+            except Exception as e:
+                print(f"\n Created Date Error: {e}")
+
+#returns the resulted rows
+def search_result (user_path, header,  search_value):
+    try:
+        rows =[]
+        found = False
+        with open(user_path, mode= "r") as read_files:
+            if search_value:
+                reading = csv.DictReader(read_files)
+                for read in reading:
+                    if read[header]== search_value:
+                        rows.append(read)
+                        found = True
+            #if not found and search_value.upper()!="Q":
+            #    print(f"\"{search_value}\" not found!!!")
+            if found:
+                return rows
+
+    except Exception as e:
+        print("Search Result Error: {e}")
 
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation For Users --------------------------------
@@ -350,8 +400,74 @@ def edit_password(user_path, id_type, id):
 
 
 #------)------------ User Search feature
+def by_username(user_path, header, field, running = True):
+    file_exists = check_file_existance(user_path)
+    if file_exists:
+        while running:
+            try:
+                username = input("\nEnter the username to search: ").title()
+                if not username:
+                    raise ValueError ("Please dont leave it empty!!!")
+                running = breaking(username)
+                if username and username!="Q":
+                    result = search_result(user_path, header, username)
+                    if result:
+                        print(f"\n{username} data: \n")
+                        df = pd.DataFrame(result)
+                        df= df[field]
+                        print(df.to_string())
 
+                    if not result:
+                        print(f"\nUsername: {username} not found!!")
 
+            except Exception as e:
+                print(f"\n Username Search Error: {e}")
+
+def by_role(user_path, header, field,running=True):
+    file_exists = check_file_existance(user_path)
+    if file_exists:
+        while running:
+            try:
+                role = input("\nEnter the role to search: ").title()
+                if not role:
+                    raise ValueError ("Please dont leave it empty!!!")
+                running = breaking(role)
+                if role and role!="Q":
+                    result = search_result(user_path, header, role)
+
+                    if result:
+                        print(f"\n{role} Users: \n")
+                        df = pd.DataFrame(result)
+                        df= df[field]
+                        print(df.to_string())
+                    if not result:
+                        print(f"\nRole: {role} not found!!")
+
+            except Exception as e:
+                print(f"\n Role Search Error: {e}")
+
+def by_status(user_path, header, field,running=True):
+    file_exists = check_file_existance(user_path)
+    if file_exists:
+        while running:
+            try:
+                status = input("\nEnter the status to search: ").title()
+                if not status:
+                    raise ValueError ("Please dont leave it empty!!!")
+                running = breaking(status)
+                if status and status!="Q":
+                    result = search_result(user_path, header,status)
+                    if result:
+                        print(f"\n{status} Users: \n")
+                        df = pd.DataFrame(result)
+                        df= df[field]
+                        print(df.to_string())
+                    if not result:
+                        print(f"\nStatus: {status} not found!!")
+
+            except Exception as e:
+                print(f"\n Status Search Error: {e}")
+    
 
 #---------------------------------------------------------------------------------------------
 # -------------------------------------- Validation for Books --------------------------------

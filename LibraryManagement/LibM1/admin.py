@@ -151,6 +151,12 @@ def user_crud(user_path, m_running = True):
 def user_search(user_path, m_running= True):
     file_exists = v.check_file_existance(user_path)
     id_header = "U_ID"
+    username_header= "Username"
+    role_header = "Role"
+    status_header = "Status"
+    created_date_header = "Created Date"
+    fields =["U_ID", "Username","Role", "Status", "Created Date"]
+
     if file_exists:
         while m_running:
             try:
@@ -159,7 +165,13 @@ def user_search(user_path, m_running= True):
                 if user_input ==1:
                     v.by_id(user_path, id_header)
                 elif user_input==2:
-                    print("HEHE")
+                    v.by_username(user_path, username_header, fields)
+                elif user_input==3:
+                    v.by_role(user_path, role_header, fields)
+                elif user_input==4:
+                    v.by_status(user_path, status_header, fields)
+                elif user_input==5:
+                    v.by_created_date(user_path, created_date_header, id_header)
                 elif user_input ==6:
                     break
                 else:
@@ -167,6 +179,9 @@ def user_search(user_path, m_running= True):
 
             except Exception as e:
                 print(f"\n Search Error: {e}")
+
+#path = r"LibraryManagement\LibM1\user_db.csv"
+#user_search(path)
 
 # ------------------------------------------------------------------ Book ------------------------------------------------------------------------------------
 
@@ -365,6 +380,7 @@ def book_crud(book_path, u_running = True):
 def book_search(book_path, m_running= True):
     file_exists = v.check_file_existance(book_path)
     id_header = "B_ID"
+    included_date_header = "Inclusion Date"
     if file_exists:
         while m_running:
             try:
@@ -374,7 +390,9 @@ def book_search(book_path, m_running= True):
                     v.by_id(book_path, id_header)
                 elif user_input==2:
                     print("HEHE")
-                elif user_input ==6:
+                elif user_input==7:
+                    v.by_created_date(book_path, included_date_header, id_header)
+                elif user_input ==8:
                     break
                 else:
                     print("\nSelect from the given option")
@@ -399,11 +417,17 @@ def main_func(role="Admin",is_running = True):
 
             elif user_choice==3:
                 user_crud(user_path)
-
+            
             elif user_choice==4:
-                book_crud(book_path)
+                book_crud(user_path)
 
-            elif user_choice==8:
+            elif user_choice==5:
+                user_search(user_path)
+
+            elif user_choice==6:
+                book_search(book_path)
+
+            elif user_choice==9:
                 print("\nThank you for using <3")
                 break
             else:

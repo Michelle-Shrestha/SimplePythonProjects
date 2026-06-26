@@ -8,7 +8,8 @@ def admin_dashboard():
     print("5. Search User ")
     print("6. Search Book ")
     print("7. Borrowed Book ")
-    print("8. Exit ") 
+    print("8. Return Book ")
+    print("9. Exit ") 
     print("----------------------------------\n")
 
 
@@ -31,17 +32,16 @@ def edit_user():
     print("6. Exit")
     print("----------------\n")
 
-def view_menu():
+def search_user_menu():
     print("\n--------- Search ---------")
     print("1. ID ")
     print("2. Username ")
-    print("3. Role")
-    print("4. Created Date ")
-    print("5. Status ")
-    print("6. Exit")
+    print("3. Role ")
+    print("4. Status ")
+    print("5. Created Date ")
+    print("6. Exit ")
     print("--------------------------\n")
     
-
 
 #--------------- BOOKS ---------------
 def book_crud_menu():
@@ -75,13 +75,11 @@ def search_book_menu(role):
     print("4. Author ")
     print("5. Published Year ")
     print("6. Price ")
-    print("7. Available Qutantity")
     if role == "Admin":
-        print("8. Total Quantity ")
-        print("9. Inclusion Date")
-        print("10. Exit ")
-    if role == "User":
+        print("7. Inclusion Date")
         print("8. Exit ")
+    if role == "User":
+        print("7. Exit ")
     print("-----------------------\n")
 
 def del_book_menu():
