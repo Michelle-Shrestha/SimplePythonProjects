@@ -423,7 +423,7 @@ def borrow_book(borrowed_book_path, book_path,user_path):
     user_id_header = "U_ID"
     username_header = "Username"
     ava_qty_header = "Available Qty"
-    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date"]
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue"]
     if not file_exists:
         v.add_csv_header(borrowed_book_path, fields)
     if file_exists:   
@@ -444,7 +444,9 @@ def borrow_book(borrowed_book_path, book_path,user_path):
                    "U_ID": user_id,
                    "Username": username_header,
                    "Borrowed Date": borrowed_date,
-                   "Return Date": returning_date
+                   "Return Date": returning_date,
+                   #needs to make func for overdue
+                   "Overdue": 0
                }
                borrow_write.writerow(borrow)
                print(f"\nSuccessfully borrowed.")
