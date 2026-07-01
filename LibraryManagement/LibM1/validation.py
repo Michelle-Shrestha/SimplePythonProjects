@@ -83,10 +83,12 @@ def float_check(u_input):
     elif u_input.isdigit():
         return float(u_input)
     
-def check_uid_for_each(id_type, search = False):
+def check_uid_for_each(id_type, search = False, borrow = False):
     if id_type == "U_ID":
         if search==True:
             id = input("\nEnter the User ID to search: ").capitalize()
+        if borrow==True:
+            id = input("\nEnter the User ID for borrowing: ").capitalize()
         else:
             id = input("\nEnter the user id to edit: ").capitalize()
         if not id:
@@ -94,6 +96,8 @@ def check_uid_for_each(id_type, search = False):
     if id_type == "B_ID":
         if search==True:
             id = input("\nEnter the Book ID to search: ").capitalize()
+        if borrow==True:
+            id = input("\nEnter the Book ID to borrow: ").capitalize()
         else:
             id = input("\nEnter the book id to edit: ").capitalize()
         if not id:
@@ -102,10 +106,10 @@ def check_uid_for_each(id_type, search = False):
         return id
 
 #validates whether id exists or not and returns it
-def check_uid(path, id_type, running = True):
+def check_uid(path, id_type, borrow_b= False, running = True):
     while running:
         try:
-            id = check_uid_for_each(id_type)
+            id = check_uid_for_each(id_type, borrow= borrow_b)
             running = breaking(id)
             id = int_check(id)
             if id:
@@ -275,9 +279,9 @@ def validate_username(edit = False, running = True):
             with open (db_path, mode="r") as db_file:
                 u_read = csv.DictReader(db_file)
                 if edit == True:
-                    username = input("\nEdit the username: ").title()
+                    username = input("\nEdit the username: ").title().strip()
                 else:
-                    username = input("\nEnter the new username: ").title()
+                    username = input("\nEnter the new username: ").title().strip()
 
                 if not username:
                     raise ValueError("Username cannot be empty!!!")
@@ -840,3 +844,52 @@ def by_price(book_path, col_header, field, searching=True):
                 print(f"\n Price  Search Error: {e}")
 
 # ------------------ Borrow Book
+def borrow_bID_title(book_path, id_header, title_header):
+    book_file_exist = check_file_existance(book_path)
+    if book_file_exist:
+        book_id = check_uid(book_path, id_header, borrow_b= True)
+        try:
+                if book_id:
+                    with  open (book_path, mode = "r") as book_file:
+                        id_read = csv.DictReader(book_file)
+                        for row in id_read:
+                            if int(row[id_header])==book_id: 
+                                title = row[title_header]
+                                return book_id, title
+                                
+        except Exception as e:
+            print(f"\n Borrow Book Error: {e}")
+
+
+
+path = r"LibraryManagement\LibM1\user_db.csv"
+def borrow_uID_username(user_path, id_header, username_header, running = True):
+    user_file_exist = check_file_existance(user_path)
+    if user_file_exist:
+        user_id = check_uid(user_path, id_header, borrow_b= True)
+        if user_id:
+            while running:
+                try:
+                    username = input("\nEnter the username: ").title().strip()
+                    if not username:
+                        raise ValueError ("Please dont leave it empty!!!")
+                    running = breaking(username)
+                    if username and username!="Q":
+                        with open(user_path, mode="r") as user_file:
+                            reading = csv.DictReader(user_file)
+                            match = False
+                            for row in reading:
+                                if int(row[id_header])== user_id:
+                                    if row[username_header]==username:
+                                        match = True
+                            if match:
+                                return user_id, username
+                            else:
+                                print(f"Username {username} for ID {user_id} doesnot match!!!")
+
+                except Exception as e:
+                    print(f"\n Borrow User Error: {e}")
+        
+#print(borrow_uID_username(path, "U_ID", "Username"))      
+#path = r"LibraryManagement\LibM1\books.csv"  
+#print(borrow_bID_title(path, "B_ID", "Title"))

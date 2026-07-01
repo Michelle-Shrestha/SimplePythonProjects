@@ -414,8 +414,36 @@ def book_search(book_path, m_running= True):
 
             except Exception as e:
                 print(f"\n Search Error: {e}")
-path = r"LibraryManagement\LibM1\books.csv"
-book_search(path)
+
+
+def borrow_book(borrowed_book_path, book_path,user_path, running = True):
+    file_exists = v.check_file_existance(borrowed_book_path)
+    book_id_header = "B_ID"
+    book_title_header = "Title"
+    user_id_header = "U_ID"
+    username_header = "Username"
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue"]
+    if not file_exists:
+        v.add_csv_header(borrowed_book_path, fields)
+    if file_exists:
+        while running:
+                try:
+                    cont = input("Type Q to quit else just enter: ").capitalize().strip()
+                    running = v.breaking(cont)
+                    with open (borrowed_book_path, mode= "a+", newline="") as borrow_file:
+                        borrow_id = v.valid_id(borrowed_book_path,"Borrow ID")
+                        book_id, title = v.borrow_bID_title(book_path, book_id_header, book_title_header)
+                        user_id, username = v.borrow_uID_username(user_path, user_id_header, username_header)
+                        borrowed_date = v.curr_date_time()
+                        print(borrow_id,book_id, title, user_id, username, borrowed_date)
+                        
+                except Exception as e:
+                    print(f"\n Borrow Book Error: {e}")
+
+b_path = r"LibraryManagement\LibM1\books.csv" 
+u_path = r"LibraryManagement\LibM1\user_db.csv"
+borrowb = r"LibraryManagement\LibM1\borrowed_books.csv"
+borrow_book(borrowb, b_path,u_path, running = True)
 
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"
