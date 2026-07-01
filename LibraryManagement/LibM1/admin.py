@@ -416,34 +416,47 @@ def book_search(book_path, m_running= True):
                 print(f"\n Search Error: {e}")
 
 
-def borrow_book(borrowed_book_path, book_path,user_path, running = True):
+def borrow_book(borrowed_book_path, book_path,user_path):
     file_exists = v.check_file_existance(borrowed_book_path)
     book_id_header = "B_ID"
     book_title_header = "Title"
     user_id_header = "U_ID"
     username_header = "Username"
-    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue"]
+    ava_qty_header = "Available Qty"
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date"]
     if not file_exists:
         v.add_csv_header(borrowed_book_path, fields)
-    if file_exists:
-        while running:
-                try:
-                    cont = input("Type Q to quit else just enter: ").capitalize().strip()
-                    running = v.breaking(cont)
-                    with open (borrowed_book_path, mode= "a+", newline="") as borrow_file:
-                        borrow_id = v.valid_id(borrowed_book_path,"Borrow ID")
-                        book_id, title = v.borrow_bID_title(book_path, book_id_header, book_title_header)
-                        user_id, username = v.borrow_uID_username(user_path, user_id_header, username_header)
-                        borrowed_date = v.curr_date_time()
-                        print(borrow_id,book_id, title, user_id, username, borrowed_date)
-                        
-                except Exception as e:
-                    print(f"\n Borrow Book Error: {e}")
+    if file_exists:   
+        with open (borrowed_book_path, mode= "a+", newline="") as borrow_file:
+           borrow_write = csv.DictWriter(borrow_file,fields)
+
+           borrow_id = v.valid_id(borrowed_book_path,"Borrow ID")
+           book_id, title = v.borrow_bID_title(book_path, book_id_header, book_title_header)
+           user_id, username = v.borrow_uID_username(user_path, user_id_header, username_header)
+           borrowed_date = v.curr_date_time()
+           returning_date = v.return_date(borrowed_date)
+           #time_remaining, overdue_days = v.overdue(borrowed_date ,returning_date) : Idea for later to add 
+           try:
+               borrow = {
+                   "Borrow ID": borrow_id+1,
+                   "B_ID": book_id,
+                   "Title": book_title_header,
+                   "U_ID": user_id,
+                   "Username": username_header,
+                   "Borrowed Date": borrowed_date,
+                   "Return Date": returning_date
+               }
+               borrow_write.writerow(borrow)
+               print(f"\nSuccessfully borrowed.")
+               v.available_qty_adjusting(book_path, book_id_header ,book_id, ava_qty_header )
+
+           except Exception as e:
+               print(f"\n Borrow Book Error: {e}")
 
 b_path = r"LibraryManagement\LibM1\books.csv" 
 u_path = r"LibraryManagement\LibM1\user_db.csv"
 borrowb = r"LibraryManagement\LibM1\borrowed_books.csv"
-borrow_book(borrowb, b_path,u_path, running = True)
+borrow_book(borrowb, b_path,u_path)
 
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"

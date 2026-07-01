@@ -1,5 +1,5 @@
 import os, csv, pandas as pd
-from datetime import datetime as dt, date as d
+from datetime import datetime as dt, date as d, timedelta
 import time as t
 import hashlib
 
@@ -862,7 +862,7 @@ def borrow_bID_title(book_path, id_header, title_header):
 
 
 
-path = r"LibraryManagement\LibM1\user_db.csv"
+
 def borrow_uID_username(user_path, id_header, username_header, running = True):
     user_file_exist = check_file_existance(user_path)
     if user_file_exist:
@@ -885,11 +885,62 @@ def borrow_uID_username(user_path, id_header, username_header, running = True):
                             if match:
                                 return user_id, username
                             else:
-                                print(f"Username {username} for ID {user_id} doesnot match!!!")
+                                print(f"\nUsername {username} for ID {user_id} doesnot match!!!")
 
                 except Exception as e:
                     print(f"\n Borrow User Error: {e}")
-        
+
+def available_qty_adjusting(book_path,b_header, book_id, ava_qty_header):
+    if book_id:
+        try:
+            with open (book_path, mode="r") as book_file:
+                reading = csv.DictReader(book_file)
+                rows=[]
+                field = reading.fieldnames
+                if ava_qty_header not in field:
+                    raise ValueError(f"\nColumn {ava_qty_header} does not exist in CSV")
+                for row in reading: 
+                    if int(row[b_header]) ==book_id:
+                        #if the book is still available
+                        if int(row[ava_qty_header])>0:
+                            row[ava_qty_header] = int(row[ava_qty_header])-1
+                            print("\nSuccessfully Adjusted Available Quantity")
+                        # if book is not available
+                        else:
+                            print(f"\nBook is out of stock!!!")
+
+                    rows.append(row)
+
+            with open (book_path, mode = "w", newline="") as write_file:
+                writing = csv.DictWriter(write_file, field)
+                writing.writeheader()
+
+                for row in rows:
+                    writing.writerow(row)
+
+        except Exception as e:
+            print(f"\n Qty Adjustment Error: {e}")
+
+def return_date(curr_date):
+    try:
+        #converting back to datetime
+        curr_dt = dt.strptime(curr_date, "%Y-%m-%d")
+        extend_weeks = int(input("\nHow many weeks to extend: "))
+        #using time delta to find the date after a week
+        return_d= curr_dt + timedelta(weeks=extend_weeks)
+        #making it string
+        return_d = dt.strftime(return_d, "%Y-%m-%d")
+        return return_d
+    
+    except Exception as e:
+        print(f"\n Return Date Error: {e}")
+
+
+    
+
+
+#path = r"LibraryManagement\LibM1\user_db.csv"        
 #print(borrow_uID_username(path, "U_ID", "Username"))      
 #path = r"LibraryManagement\LibM1\books.csv"  
+#available_qty_adjusting(path,"B_ID", 1, "Available Qty")
 #print(borrow_bID_title(path, "B_ID", "Title"))
