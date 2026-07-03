@@ -850,15 +850,20 @@ def borrow_bID_title_qty(book_path, id_header, title_header, total_qty_h):
         book_id = check_uid(book_path, id_header, borrow_b= True)
         try:
                 if book_id:
+                    found = False
                     with  open (book_path, mode = "r") as book_file:
-                        title = None
+                        
                         id_read = csv.DictReader(book_file)
                         for row in id_read:
                             if int(row[id_header])==book_id: 
-                                title = row[title_header]
-                                t_qty = row[total_qty_h]
+                                title = str(row[title_header])
+                                t_qty = int(row[total_qty_h])
+                                found = True
                                 
+                    if found:   
                         return book_id, title, t_qty
+                    if not found:
+                        print(f"\nBook ID {book_id} not found!!!")
                                 
         except Exception as e:
             print(f"\n Borrow Book Error: {e}")
@@ -876,9 +881,10 @@ def borrow_uID_username(user_path, id_header, username_header, running = True):
                         raise ValueError ("Please dont leave it empty!!!")
                     running = breaking(username)
                     if username and username!="Q":
+                        match = False
                         with open(user_path, mode="r") as user_file:
                             reading = csv.DictReader(user_file)
-                            match = False
+                            
                             for row in reading:
                                 if int(row[id_header])== user_id:
                                     if row[username_header]==username:
@@ -951,79 +957,97 @@ def return_date(curr_date, running = True):
         except Exception as e:
             print(f"\n Return Date Error: {e}")
 
+def return_values(borrow_path, book_path, bid_h, borrow_h , title_h, t_qty_h, uid_h, usern_h):
 
-def return_book_borrow_id(borrow_path, running = True):
-    while running:
-        try:
-            book_id = input("Enter the book id: ").strip()
-            running = breaking(book_id)
-            if not book_id:
-                raise ValueError("Please dont leave it empty!!!")
-            else:
-                return book_id
-        except Exception as e:
-            print(f"\n Return Book Error: {e}")
-
-def return_values(borrow_path, book_path, bid_h, borrow_h , title_h, t_qty_h, uid_h, usern_h, running = True):
-    while running:
         try:
             book_id, book_title, t_qty = borrow_bID_title_qty(book_path, bid_h, title_h, t_qty_h)
+            found = False
             with open (borrow_path, mode="r") as read_file:
-                borrow_id = None
-                user_id = None
-                username = None
                 reading = csv.DictReader(read_file)
                 for read in reading: 
                     if int(read[bid_h]) == book_id:
-                        borrow_id = read[borrow_h]
-                        user_id = read[uid_h]
-                        username = read[usern_h]
+                        borrow_id = int(read[borrow_h])
+                        user_id = int(read[uid_h])
+                        username = str(read[usern_h])
+                        found = True 
+                        #if the matches 
+                        return book_id, borrow_id, book_title, t_qty, user_id, username
 
-                    else:
-                        print(f"\nBook ID {book_id} not found!!!")
-                return book_id, borrow_id, book_title, t_qty, user_id, username
+                if not found:
+                    print(f"\nBook must have been returned already!!!")
+
 
         except Exception as e:
             print(f"\n Return Book Value Error: {e}")
 
-def return_choice(borrow_path,book_path, bid_h, borrow_h , title_h, t_qty_h, uid_h, usern_h, running = True): 
+
+def return_choice(borrow_path,book_path, bid_h, borrow_h , title_h, t_qty_h, uid_h, usern_h,running = True): 
     file_exists = check_file_existance(borrow_path)
     if file_exists:
         while running:
             try:
-                choice = input("\nEnter the Username or User ID: ").title()
-                found = False
+                choice = input("\nEnter the Username or User ID: ").title().strip()
                 if not choice:
                     raise ValueError("Please donot leave it empty!!!")
                 running = breaking(choice)
+                found = False
                 with open (borrow_path, mode="r") as read_file:
                     reading = csv.DictReader(read_file)
-                    if choice.isdigit():
-                        for row in reading: 
-                        
-                            choice = int_check(choice)
-                            if int(row[uid_h])==choice:
-                                book_id, borrow_id, book_title,t_qty, user_id, username = return_values(borrow_path,book_path, bid_h, borrow_h , title_h, uid_h, usern_h, t_qty_h)
+                    for row in reading:
+                        if choice.isdigit() and int(row[uid_h])== int(choice):   
+                                book_id, borrow_id, book_title,t_qty, user_id, username = return_values(borrow_path,book_path, bid_h, borrow_h , title_h, t_qty_h,uid_h, usern_h)
                                 found = True
                                 return book_id, borrow_id, book_title, t_qty, user_id, username
 
-
-                    elif choice.isalpha(): 
-                        choice = choice.strip() 
-                        for row in reading: 
-                            if row[usern_h]==choice:
-                                book_id, borrow_id, book_title,t_qty, user_id, username = return_values(borrow_path, book_path, bid_h, borrow_h , title_h, uid_h, usern_h, t_qty_h)
+                        elif choice.isalpha() and str(row[usern_h]).title().strip()==choice: 
+                                book_id, borrow_id, book_title,t_qty, user_id, username = return_values(borrow_path, book_path, bid_h, borrow_h , title_h,t_qty_h, uid_h, usern_h)
                                 found = True
                                 return book_id, borrow_id, book_title, t_qty, user_id, username
-                        
+                                
                     if not found:
-                        print(f"\n {choice} does not exist in borrow book")
+                        if choice.isdigit():
+                            print(f"\nUser ID {choice} has not borrowed any book!!!")
+                        elif choice.isalpha():
+                            print(f"\nUsername {choice} has not borrowed any book!!!")
                             
             except Exception as e:
                 print(f"\n Return Book Error: {e}")
 
-#path = r"LibraryManagement\LibM1\user_db.csv"        
-#print(borrow_uID_username(path, "U_ID", "Username"))      
-#path = r"LibraryManagement\LibM1\books.csv"  
-#available_qty_adjusting(path,"B_ID", 1, "Available Qty")
-#print(borrow_bID_title(path, "B_ID", "Title"))
+def borrowed_book_status_adjusting(borrow_book_path,borrow_id_header,borrowed_id,status_header):
+    if borrowed_id:
+        try:
+            rows=[]
+            with open (borrow_book_path, mode="r") as borrow_file:
+                reading = csv.DictReader(borrow_file)
+                field = reading.fieldnames
+                if status_header not in field:
+                    raise ValueError(f"\nColumn {status_header} does not exist in CSV")
+                
+                is_already_returned= False
+                for row in reading: 
+                    if int(row[borrow_id_header]) ==borrowed_id:
+                        #if book is borroweed
+                        if str(row[status_header])=="Borrowed":
+                            row[status_header] = "Returned"
+                            print("\nStatus Successfully Adjusted")
+                        # if book is not available
+                    
+
+                        if str(row[status_header])=="Returned":
+                            print(f"\nMust be already returned!!!")
+                            is_already_returned = True
+                            break
+                    rows.append(row)
+
+                if not is_already_returned:
+                    with open (borrow_book_path, mode = "w", newline="") as write_file:
+                        writing = csv.DictWriter(write_file, field)
+                        writing.writeheader(field)
+
+                        for row in rows:
+                            writing.writerow(row)
+
+                return is_already_returned # if the book is already returned then it returns false else if adjusted it returns true
+        
+        except Exception as e:
+            print(f"\n Borrowed CSV Status Adjustment Error: {e}")

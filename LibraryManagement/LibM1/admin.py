@@ -78,7 +78,7 @@ def delete_users(user_path, m_running = True):
                 try:
                     del_id= input("\nUser ID to delete: ").upper()
                     if not del_id:
-                        raise ValueError ("Please Enter rhe User ID to Delete")
+                        raise ValueError ("Please Enter the User ID to Delete")
                     m_running = v.breaking(del_id)
                     df = pd.read_csv(user_path)
                     del_id = v.int_check(del_id)
@@ -426,7 +426,8 @@ def borrow_book(borrowed_book_path, book_path,user_path):
     username_header = "Username"
     total_qty_header = "Total Qty"
     ava_qty_header = "Available Qty"
-    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue"]
+    status_header = "Status"
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue","Status"]
     if not file_exists:
         v.add_csv_header(borrowed_book_path, fields)
     if file_exists:   
@@ -449,7 +450,8 @@ def borrow_book(borrowed_book_path, book_path,user_path):
                    "Borrowed Date": borrowed_date,
                    "Return Date": returning_date,
                    #needs to make func for overdue
-                   "Overdue": 0
+                   "Overdue": 0,
+                   status_header: "Borrowed"
                }
                borrow_write.writerow(borrow)
                print(f"\nSuccessfully borrowed.")
@@ -459,53 +461,62 @@ def borrow_book(borrowed_book_path, book_path,user_path):
                print(f"\n Borrow Book Error: {e}")
 
 
-def return_book(return_book_path, borrowed_book_path, book_path):
+def return_book(return_book_path, borrowed_book_path, book_path, running = True):
     file_exists = v.check_file_existance(return_book_path)
-    fields = ["Return ID", "Borrow ID", "Book ID", "Book Title", "User ID", "Username", "Return Date"]
+    fields = ["Return ID", "Borrow ID", "B_ID", "Title", "U_ID", "Username", "Return Date"]
     if not file_exists:
         v.add_csv_header(return_book_path, fields)
     if file_exists:
-        return_id_h = "Return ID"
-        borrow_id_h = "Borrow ID"
-        book_id_header = "B_ID"
-        book_title_header = "Title"
-        book_t_qty_header = "Total Qty"
-        book_ava_qty_header = "Available Qty"
-        user_id_header = "U_ID"
-        username_header = "Username"
-        return_date_h = "Return Date"
-        with open(return_book_path, mode = "a+", newline="") as return_file:
-            returnBook_write = csv.DictWriter(return_file, fields)
+        while running:
+            user_input= input("\nPress Y to return book Else press Q to exit: ").capitalize()
+            running = v.breaking(user_input)
+            if user_input=="Y":
+                return_id_h = "Return ID"
+                borrow_id_h = "Borrow ID"
+                book_id_header = "B_ID"
+                book_title_header = "Title"
+                book_t_qty_header = "Total Qty"
+                book_ava_qty_header = "Available Qty"
+                user_id_header = "U_ID"
+                username_header = "Username"
+                return_date_h = "Return Date"
+                status_header = "Status"
+                
+                with open(return_book_path, mode = "a+", newline="") as return_file:
+                    returnBook_write = csv.DictWriter(return_file, fields)
 
-            return_id = (v.valid_id(return_book_path, return_id_h ))+1
-            return_date = v.curr_date_time()
-            book_id, borrow_id, book_title, t_qty_h, user_id, username = v.return_choice(borrowed_book_path, book_path, book_id_header, borrow_id_h, book_title_header, book_t_qty_header, user_id_header, username_header)
-            
-            try:
-                return_book_values ={
-                    return_id_h: return_id,
-                    borrow_id_h: borrow_id,
-                    book_id_header: book_id,
-                    book_title_header: book_title,
-                    user_id_header: user_id, 
-                    username_header: username,
-                    return_date_h: return_date
-                }
-                returnBook_write.writerow(return_book_values)
-                print(f"Successfully Reutrned!!!")
-                v.available_qty_adjusting(book_path, book_id_header ,book_id, book_ava_qty_header, book_t_qty_header ,return_book=True)
+                    return_id = (v.valid_id(return_book_path, return_id_h ))+1
+                    return_date = v.curr_date_time()
+                    book_id, borrow_id, book_title, t_qty, user_id, username = v.return_choice(borrowed_book_path, book_path, book_id_header, borrow_id_h, book_title_header, book_t_qty_header, user_id_header, username_header)
+                    success = v.borrowed_book_status_adjusting(borrowed_book_path, borrow_id_h, borrow_id,status_header)
+                    if success:
+                        try:
+                            return_book_values ={
+                                return_id_h: return_id,
+                                borrow_id_h: borrow_id,
+                                book_id_header: book_id,
+                                book_title_header: book_title,
+                                user_id_header: user_id, 
+                                username_header: username,
+                                return_date_h: return_date
+                            }
+                            returnBook_write.writerow(return_book_values)
+                            print(f"Successfully Reutrned!!!")
+                            v.available_qty_adjusting(book_path, book_id_header ,book_id, book_ava_qty_header, t_qty ,return_book=True)
+                            
 
 
-            except Exception as e:
-                print(f"\n Error Wririting in Return Book CSV: {e}")
+                        except Exception as e:
+                            print(f"\n Error Wririting in Return Book CSV: {e}")
     
 
 b_path = r"LibraryManagement\LibM1\books.csv" 
 u_path = r"LibraryManagement\LibM1\user_db.csv"
 return_b = r"LibraryManagement\LibM1\returned_books.csv"
 borrowb = r"LibraryManagement\LibM1\borrowed_books.csv"
-return_book(return_b, borrowb, b_path)
+
 #borrow_book(borrowb, b_path,u_path)
+return_book(return_b, borrowb, b_path)
 
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"
@@ -540,3 +551,8 @@ def main_func(role="Admin",is_running = True):
 
         except Exception as e:
             print(f"ERROR: {e}")
+
+
+# need to correct the return_book functions
+# need to make strip and title work in return_value function
+# need to correct status of borrow book (correct status function)

@@ -1,1 +1,6 @@
-Return ID,Borrow ID,Book ID,Book Title,User ID,Username,Return Date
+Return ID,Borrow ID,B_ID,Title,U_ID,Username,Return Date
+1,1,1,1984,1001,Hehe,2026-07-03
+2,2,3,Crime And Punishment,1003,Mentally Ill,2026-07-03
+3,1,1,1984,1001,Hehe,2026-07-03
+4,2,3,Crime And Punishment,1003,Mentally Ill,2026-07-03
+5,1,1,1984,1001,Hehe,2026-07-03
