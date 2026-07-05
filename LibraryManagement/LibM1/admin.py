@@ -88,6 +88,7 @@ def delete_users(user_path, m_running = True):
                             if del_id not in df["U_ID"].values:
                                 print(f"\nID {del_id} does not exists")
                             else:
+                                #stores all the id that is not del id (Except Deleting ID row, it keeps all other data)
                                 df =df[df["U_ID"]!=del_id]
                                 df.to_csv(user_path, index=False)
                                 print(f"\nID {del_id} Deleted Successfully")
@@ -426,8 +427,8 @@ def borrow_book(borrowed_book_path, book_path,user_path):
     username_header = "Username"
     total_qty_header = "Total Qty"
     ava_qty_header = "Available Qty"
-    status_header = "Status"
-    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue","Status"]
+    #status_header = "Status"
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, "Borrowed Date", "Return Date", "Overdue"]
     if not file_exists:
         v.add_csv_header(borrowed_book_path, fields)
     if file_exists:   
@@ -451,7 +452,6 @@ def borrow_book(borrowed_book_path, book_path,user_path):
                    "Return Date": returning_date,
                    #needs to make func for overdue
                    "Overdue": 0,
-                   status_header: "Borrowed"
                }
                borrow_write.writerow(borrow)
                print(f"\nSuccessfully borrowed.")
@@ -461,7 +461,7 @@ def borrow_book(borrowed_book_path, book_path,user_path):
                print(f"\n Borrow Book Error: {e}")
 
 
-def return_book(return_book_path, borrowed_book_path, book_path, running = True):
+def return_book(return_book_path, borrowed_book_path, user_path, book_path, running = True):
     file_exists = v.check_file_existance(return_book_path)
     fields = ["Return ID", "Borrow ID", "B_ID", "Title", "U_ID", "Username", "Return Date"]
     if not file_exists:
@@ -473,36 +473,40 @@ def return_book(return_book_path, borrowed_book_path, book_path, running = True)
             if user_input=="Y":
                 return_id_h = "Return ID"
                 borrow_id_h = "Borrow ID"
-                book_id_header = "B_ID"
-                book_title_header = "Title"
-                book_t_qty_header = "Total Qty"
-                book_ava_qty_header = "Available Qty"
-                user_id_header = "U_ID"
-                username_header = "Username"
+                book_id_h = "B_ID"
+                book_title_h = "Title"
+                t_qty_h = "Total Qty"
+                book_ava_qty_h = "Available Qty"
+                user_id_h = "U_ID"
+                username_h = "Username"
                 return_date_h = "Return Date"
-                status_header = "Status"
+                status_h = "Status"
                 
                 with open(return_book_path, mode = "a+", newline="") as return_file:
                     returnBook_write = csv.DictWriter(return_file, fields)
 
                     return_id = (v.valid_id(return_book_path, return_id_h ))+1
                     return_date = v.curr_date_time()
-                    book_id, borrow_id, book_title, t_qty, user_id, username = v.return_choice(borrowed_book_path, book_path, book_id_header, borrow_id_h, book_title_header, book_t_qty_header, user_id_header, username_header)
-                    success = v.borrowed_book_status_adjusting(borrowed_book_path, borrow_id_h, borrow_id,status_header)
-                    if success:
+                    user_id, username = v.return_choice(borrowed_book_path,user_path, user_id_h, username_h)
+                    if user_id and username:
+                        book_id, book_title, t_qty = v.borrow_bID_title_qty(book_path, book_id_h,book_title_h,t_qty_h)
+                        borrow_id= v.return_values(borrowed_book_path, borrow_id_h, book_id_h, book_id, user_id_h, user_id)
+
+                    if borrow_id:
                         try:
                             return_book_values ={
                                 return_id_h: return_id,
                                 borrow_id_h: borrow_id,
-                                book_id_header: book_id,
-                                book_title_header: book_title,
-                                user_id_header: user_id, 
-                                username_header: username,
+                                book_id_h: book_id,
+                                book_title_h: book_title,
+                                user_id_h: user_id, 
+                                username_h: username,
                                 return_date_h: return_date
                             }
                             returnBook_write.writerow(return_book_values)
                             print(f"Successfully Reutrned!!!")
-                            v.available_qty_adjusting(book_path, book_id_header ,book_id, book_ava_qty_header, t_qty ,return_book=True)
+                            v.available_qty_adjusting(book_path, book_id_h ,book_id, book_ava_qty_h, t_qty ,return_book=True)
+                            v.del_returnedbooks(borrowed_book_path, borrow_id_h, borrow_id)
                             
 
 
@@ -516,7 +520,7 @@ return_b = r"LibraryManagement\LibM1\returned_books.csv"
 borrowb = r"LibraryManagement\LibM1\borrowed_books.csv"
 
 #borrow_book(borrowb, b_path,u_path)
-return_book(return_b, borrowb, b_path)
+return_book(return_b, borrowb,u_path, b_path)
 
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"
