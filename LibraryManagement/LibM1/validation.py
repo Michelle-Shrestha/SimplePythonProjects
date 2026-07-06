@@ -962,62 +962,53 @@ def return_date(curr_date, running = True):
             print(f"\n Return Date Error: {e}")
 
 
-
-
-def return_choice(borrow_path, user_path, uID_h, usern_h, running =True):
-    file_exists = check_file_existance(user_path)
-    if file_exists: 
-        while running:
-            try:
-                choice = input("\nEnter the User ID or Username: ").title()
-                running = breaking(choice)
-                if not choice:
-                    raise ValueError("Please donot leave it empty!!!")
-                if choice:
-                    user_found = False
-                    with open (user_path, mode="r") as user_file, \
-                    open (borrow_path, mode="r") as borrow_file:
-                        user_read = csv.DictReader(user_file)
-                        borrowed_read = csv.DictReader(borrow_file)
-                        for row in user_read:
-                            if choice.isdigit():
-                                if int(row[uID_h]) == int(choice):
-                                #now if user id exists, then checks if the user has borrowed book or not
-                                    for borrowed in borrowed_read:
-                                        if int(borrowed[uID_h]) ==int(choice):
-                                            user_name = str(borrowed[usern_h]).title().strip()
-                                            user_id = int(choice)
-                                            user_found = True
-                                            return user_id, user_name
-                                        else:
-                                            print(f"\nUser ID {int(choice)} has not borrowed any book!!!")
-                                            return False
-                            
-                            elif choice.isalpha():
-                                choice = choice.strip()
-                                if str(row[usern_h]) == str(choice):
-                                    #now if username exists, then checks if the user has borrowed book or not
-                                    for borrowed in borrowed_read:
-                                        if int(borrowed[uID_h]) ==int(choice):
-                                            user_name = choice.title().strip()
-                                            user_id = int(borrowed[uID_h])
-                                            user_found = True
-                                            return user_id, user_name
-                                        else:
-                                            print(f"\nUsername {choice} has not borrowed any book!!!")
-                                            return False
-                                        
-                        if not user_found:
-                            print(f"\nUser with {"ID" if choice.isdigit() else "Username"} {choice} not found")
-            
-            except Exception as e:
-                print(f"\n Return CSV choice error: {e}")
-
-
-def return_values(borrow_path, borrow_h, bid_h , bid, uid_h, uID):
+def returned_by_id_un(borrow_path, user_path,user_header, user_id_h, running = True):
+    while running:
         try:
-            success = False
-            found = False
+            not_valid = False
+            user_found = False 
+            is_borrowed = False
+            user_id = None
+            if user_header== "U_ID":
+                user_valid = input("\nEnter the User ID: ")
+                if not user_valid.isdigit():
+                    print("\nInvalid User ID")
+                    not_valid = True # checks for validating proper Integer ID
+                
+            elif user_header=="Username":
+                user_valid = input("\nEnter the username: ").title().strip()
+
+            if not user_valid:
+                raise ValueError ("Please donot leave it empty!!!")
+            elif user_valid and not not_valid:
+                with open (user_path, mode="r") as user_file, \
+                    open (borrow_path, mode="r") as borrow_file:
+                    user_csv = csv.DictReader(user_file)
+                    borrowed_csv = csv.DictReader(borrow_file)
+                    for row in user_csv:
+                        if str(user_valid) == str(row[user_header]): 
+                            #if user exists in user csv file then only checks if user had borrowed book or not
+                            user_id = int(row[user_id_h])
+                            user_found = True
+                            for borrowed in borrowed_csv:
+                                if str(user_id) == (borrowed[user_id_h]): 
+                                    is_borrowed = True
+                                    break
+                                    
+                if user_found == False:
+                    print(f"\nUser not found!!!")
+                
+                if user_found and is_borrowed == False:
+                    print(f"\nUser has not recently borrowed book")
+                
+                else:
+                    return is_borrowed, user_id
+
+        except Exception as e:
+            print(f"\nReturning Book Error: {e}")
+        
+def return_values(borrow_path, borrow_h, bid_h , bid, uid_h, uID,username_h):
+        try:
             with open (borrow_path, mode="r") as read_file:
                 reading = csv.DictReader(read_file)
 
@@ -1026,12 +1017,13 @@ def return_values(borrow_path, borrow_h, bid_h , bid, uid_h, uID):
                     if int(read[uid_h]) == int(uID):
                         if int(read[bid_h]) ==int(bid):
                             borrowed_id = int(read[borrow_h])
-                            found= True
-                            return borrowed_id
+                            username = str(read[username_h])
+                            return int(borrowed_id), username 
                         else:
                             print(f"\nUser ID {uID} has not borrowed the book with Book ID {bid}")
                             print(f"\nBooks borrowed by User ID {uID}: \n")
                             view_row(borrow_path, uid_h, uID, return_csv=True)
+                            return None, None
 
         except Exception as e:
             print(f"\n Return Book Value Error: {e}")

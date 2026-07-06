@@ -464,54 +464,71 @@ def borrow_book(borrowed_book_path, book_path,user_path):
 def return_book(return_book_path, borrowed_book_path, user_path, book_path, running = True):
     file_exists = v.check_file_existance(return_book_path)
     fields = ["Return ID", "Borrow ID", "B_ID", "Title", "U_ID", "Username", "Return Date"]
+    is_borrowed = False
+    user_id = None
     if not file_exists:
         v.add_csv_header(return_book_path, fields)
     if file_exists:
+        return_id_h = "Return ID"
+        borrow_id_h = "Borrow ID"
+        book_id_h = "B_ID"
+        book_title_h = "Title"
+        t_qty_h = "Total Qty"
+        book_ava_qty_h = "Available Qty"
+        user_id_h = "U_ID"
+        username_h = "Username"
+        return_date_h = "Return Date"
+                    
         while running:
-            user_input= input("\nPress Y to return book Else press Q to exit: ").capitalize()
-            running = v.breaking(user_input)
-            if user_input=="Y":
-                return_id_h = "Return ID"
-                borrow_id_h = "Borrow ID"
-                book_id_h = "B_ID"
-                book_title_h = "Title"
-                t_qty_h = "Total Qty"
-                book_ava_qty_h = "Available Qty"
-                user_id_h = "U_ID"
-                username_h = "Username"
-                return_date_h = "Return Date"
-                status_h = "Status"
+                try:
+                    choice = m.return_by()
+                    if choice:
+                        choice =int(choice)
+                        if choice==1:
+                            user_header = "U_ID" 
+                            is_borrowed, user_id = v.returned_by_id_un(borrowed_book_path,user_path, user_header, user_id_h)
+                        elif choice ==2:
+                            user_header = "Username"
+                            is_borrowed, user_id = v.returned_by_id_un(borrowed_book_path,user_path, user_header, user_id_h)
+                    
+                        elif choice ==3:
+                            break
+                        else:
+                            print(f"\nPlease Select from the given options!!!")
+
+                    with open(return_book_path, mode = "a+", newline="") as return_file:
+                        returnBook_write = csv.DictWriter(return_file, fields)
+                        return_id = (v.valid_id(return_book_path, return_id_h ))+1
+                        return_date = v.curr_date_time()
+                        #is_borrowed, user_id = v.returned_by_id_un(borrowed_book_path,user_path, user_header, user_id_h)
                 
-                with open(return_book_path, mode = "a+", newline="") as return_file:
-                    returnBook_write = csv.DictWriter(return_file, fields)
+                        if is_borrowed: #means user has borrowed the given book
+                            # gets book id
+                            book_id, book_title, t_qty = v.borrow_bID_title_qty(book_path, book_id_h,book_title_h,t_qty_h)
+                            if book_id:
+                                borrow_id, username = v.return_values(borrowed_book_path, borrow_id_h, book_id_h, book_id, user_id_h, user_id, username_h)
 
-                    return_id = (v.valid_id(return_book_path, return_id_h ))+1
-                    return_date = v.curr_date_time()
-                    user_id, username = v.return_choice(borrowed_book_path,user_path, user_id_h, username_h)
-                    if user_id and username:
-                        book_id, book_title, t_qty = v.borrow_bID_title_qty(book_path, book_id_h,book_title_h,t_qty_h)
-                        borrow_id= v.return_values(borrowed_book_path, borrow_id_h, book_id_h, book_id, user_id_h, user_id)
+                                if borrow_id and username: # if all the dict value exists then only it writes
+                                    try:
+                                        return_book_values ={
+                                            return_id_h: return_id,
+                                            borrow_id_h: borrow_id,
+                                            book_id_h: book_id,
+                                            book_title_h: book_title,
+                                            user_id_h: user_id, 
+                                            username_h: username,
+                                            return_date_h: return_date
+                                        }
+                                        returnBook_write.writerow(return_book_values)
+                                        print(f"Successfully Reutrned!!!")
+                                        v.available_qty_adjusting(book_path, book_id_h ,book_id, book_ava_qty_h, t_qty ,return_book=True)
+                                        v.del_returnedbooks(borrowed_book_path, borrow_id_h, borrow_id)
+                                        
+                                    except Exception as e:
+                                        print(f"\n Error Wririting in Return Book CSV: {e}")
+                except Exception as e:
+                    print(f"\nReturn CSV File Error: {e}")
 
-                    if borrow_id:
-                        try:
-                            return_book_values ={
-                                return_id_h: return_id,
-                                borrow_id_h: borrow_id,
-                                book_id_h: book_id,
-                                book_title_h: book_title,
-                                user_id_h: user_id, 
-                                username_h: username,
-                                return_date_h: return_date
-                            }
-                            returnBook_write.writerow(return_book_values)
-                            print(f"Successfully Reutrned!!!")
-                            v.available_qty_adjusting(book_path, book_id_h ,book_id, book_ava_qty_h, t_qty ,return_book=True)
-                            v.del_returnedbooks(borrowed_book_path, borrow_id_h, borrow_id)
-                            
-
-
-                        except Exception as e:
-                            print(f"\n Error Wririting in Return Book CSV: {e}")
     
 
 b_path = r"LibraryManagement\LibM1\books.csv" 

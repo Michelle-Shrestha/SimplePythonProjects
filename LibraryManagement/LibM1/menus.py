@@ -5,12 +5,28 @@ def admin_dashboard():
     print("2. Books List ")
     print("3. User Sub Menu ")
     print("4. Book Sub Menu ")
-    print("5. Search User ")
-    print("6. Search Book ")
-    print("7. Borrowed Book ")
-    print("8. Return Book ")
-    print("9. Exit ") 
+    print("5. Borrow Book ")
+    print("6. Return Book ")
+    print("7. Search Operation ")
+    print("8. Exit ") 
     print("----------------------------------\n")
+
+def search_menu():
+    try:
+        print("\n-----Search OPERATION-----")
+        print("1. Search User ")
+        print("2. Search Book ")
+        print("3. Search User ")
+        print("4. Search Book ")
+        print("5. Exit ")
+        print("----------------------------\n")
+        choice = int(input("\nChoose Option: "))
+        if choice:
+            return choice
+        else:
+            raise ValueError ("Please choose from the option!!!")
+    except ValueError as ve:
+        print(f"\n Delete Value Error: {ve}")
 
 
 #----------------- Users------------------
@@ -84,7 +100,7 @@ def search_book_menu(role):
 
 def del_book_menu():
     try:
-        print("\n---Delete Option--- ")
+        print("\n--- Delete Option --- ")
         print("1. Delete by ID")
         print("2. Delete by ISBN")
         print("3. Exit")
@@ -96,3 +112,42 @@ def del_book_menu():
 
     except ValueError as ve:
         print(f"\n Delete Value Error: {ve}")
+
+#-------------------------------- Borrow and return -----------
+def return_by():
+    try:
+        print("\n---- Return Option ---- ")
+        print("1. Return by User ID")
+        print("2. Return by Username")
+        print("3. Exit")
+        print("-----------------\n")
+
+        choice = input("\nChoose Option: ")
+        if not choice:
+            raise ValueError ("Please dont leave it empty!!")
+        else:
+            return choice
+
+    except ValueError as ve:
+        print(f"\n Delete Value Error: {ve}")
+
+def search_borrowed_menu():
+    print("\n--------- Search ---------")
+    print("1. User ID ")
+    print("2. Username ")
+    print("3. Book ID ")
+    print("4. Title ")
+    print("5. Borrowed Date ")
+    print("6. Overdue Days")
+    print("6. Exit ")
+    print("--------------------------\n")
+
+def search_returned_menu():
+    print("\n--------- Search ---------")
+    print("1. User ID ")
+    print("2. Username ")
+    print("3. Book ID ")
+    print("4. Title ")
+    print("5. Returned Date ")
+    print("6. Exit ")
+    print("--------------------------\n")
