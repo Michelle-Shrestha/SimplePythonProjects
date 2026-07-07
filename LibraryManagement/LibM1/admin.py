@@ -181,9 +181,6 @@ def user_search(user_path, m_running= True):
             except Exception as e:
                 print(f"\n Search Error: {e}")
 
-#path = r"LibraryManagement\LibM1\user_db.csv"
-#user_search(path)
-
 # ------------------------------------------------------------------ Book ------------------------------------------------------------------------------------
 
 def book_details(path,role="User", running=True):
@@ -529,51 +526,66 @@ def return_book(return_book_path, borrowed_book_path, user_path, book_path, runn
                 except Exception as e:
                     print(f"\nReturn CSV File Error: {e}")
 
+def search_operation(book_path,user_path, running = True):
+    while running:
+        try:
+            choice = m.main_search_menu()
+            if choice:
+                choice= int(choice)
+                if choice ==1:
+                    user_search(user_path)
+                elif choice ==2:
+                    book_search(book_path)
+                elif choice ==5:
+                    break
+                else:
+                    print(f"Please Select from the given option!!!")
+        except Exception as e:
+            print(f"Search Operation Error: {e}")
+
     
-
-b_path = r"LibraryManagement\LibM1\books.csv" 
-u_path = r"LibraryManagement\LibM1\user_db.csv"
-return_b = r"LibraryManagement\LibM1\returned_books.csv"
-borrowb = r"LibraryManagement\LibM1\borrowed_books.csv"
-
-#borrow_book(borrowb, b_path,u_path)
-return_book(return_b, borrowb,u_path, b_path)
-
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"
     user_path = r"LibraryManagement\LibM1\user_db.csv"
+    return_book_path = r"LibraryManagement\LibM1\returned_books.csv"
+    borrow_book_path= r"LibraryManagement\LibM1\borrowed_books.csv"
     while is_running:
         try:
             m.admin_dashboard()
-            user_choice = int(input("Enter your choice: "))
-            if user_choice==1:
-                user_details(user_path)
+            user_choice = input("Enter your choice: ")
+            if not user_choice:
+                raise ValueError("Please donot leave it empty!!!")
+            if user_choice:
+                user_choice = int(user_choice)
 
-            elif user_choice==2:
-                book_details(book_path, role)
+                if user_choice==1:
+                    user_details(user_path)
 
-            elif user_choice==3:
-                user_crud(user_path)
-            
-            elif user_choice==4:
-                book_crud(user_path)
+                elif user_choice==2:
+                    book_details(book_path, role)
 
-            elif user_choice==5:
-                user_search(user_path)
+                elif user_choice==3:
+                    user_crud(user_path)
+                
+                elif user_choice==4:
+                    book_crud(user_path)
 
-            elif user_choice==6:
-                book_search(book_path)
+                elif user_choice==5:
+                    borrow_book(borrow_book_path, book_path, user_path)
 
-            elif user_choice==9:
-                print("\nThank you for using <3")
-                break
-            else:
-                print("Please Select from the given Options!!!")
+                elif user_choice==6:
+                    return_book(return_book_path, borrow_book_path,user_path,book_path)
+
+                elif user_choice==7:
+                    search_operation(book_path, user_path)
+
+                elif user_choice==8:
+                    print("\nThank you for using <3")
+                    break
+                else:
+                    print("Please Select from the given Options!!!")
 
         except Exception as e:
             print(f"ERROR: {e}")
 
-
-# need to correct the return_book functions
-# need to make strip and title work in return_value function
-# need to correct status of borrow book (correct status function)
+main_func()

@@ -11,20 +11,20 @@ def admin_dashboard():
     print("8. Exit ") 
     print("----------------------------------\n")
 
-def search_menu():
+def main_search_menu():
     try:
         print("\n-----Search OPERATION-----")
-        print("1. Search User ")
-        print("2. Search Book ")
-        print("3. Search User ")
-        print("4. Search Book ")
+        print("1. User Search Menu")
+        print("2. Book Search Menu ")
+        print("3. Search Menu")
+        print("4. Search Menu")
         print("5. Exit ")
         print("----------------------------\n")
-        choice = int(input("\nChoose Option: "))
+        choice = input("\nChoose Option: ")
         if choice:
             return choice
-        else:
-            raise ValueError ("Please choose from the option!!!")
+        if not choice:
+            raise ValueError ("Please donot leave it empty!!!")
     except ValueError as ve:
         print(f"\n Delete Value Error: {ve}")
 
