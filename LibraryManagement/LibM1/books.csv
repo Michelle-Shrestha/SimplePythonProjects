@@ -1,4 +1,4 @@
 B_ID,Title,ISBN,Author,Published Year,Description,Price NRS,Total Qty,Available Qty,Inclusion Date
-1,1984,9780451524935,George Orwell,1950,Dystopia,999.0,10,10,2026-06-17
-3,Crime And Punishment,9780140449136,Fyodor Dostoevsky,1866,Description not available,1111.0,11,11,2026-06-17
-4,Into The Wild,9780385486804,Jon Krakauer,2005,True story of christopher johnson mccandless,999.0,50,50,2026-06-20
+1,1984,9780451524935,George Orwell,1950,Dystopia,999.0,10,9,2026-06-17
+3,Crime And Punishment,9780140449136,Fyodor Dostoevsky,1866,Description not available,1111.0,11,10,2026-06-17
+4,Into The Wild,9780385486804,Jon Krakauer,2005,True story of christopher johnson mccandless,999.0,50,49,2026-06-20

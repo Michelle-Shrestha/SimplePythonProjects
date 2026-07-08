@@ -130,7 +130,7 @@ def check_uid(path, id_type, borrow_b= False, running = True):
             print(f"\n ID error: {e}")  
 
 #Edit the cols (takes param: csv file, id header whether of book or col, uni id no, col header of changing variable, and the replacing val)
-def edit_value(file_path, id_type , id_no, column, new_val):
+def edit_value(file_path, id_type , id_no, column, new_val, extend_date = False):
     file_exists = check_file_existance(file_path)
     if file_exists:
         try:
@@ -153,7 +153,10 @@ def edit_value(file_path, id_type , id_no, column, new_val):
                                 None
                             else:
                                 row[column] = new_val
-                                print(f"\nSuccessfully changed to new value \"{new_val}\" ")
+                                if extend_date:
+                                    print(f"\nSuccessfully extended the book deadline till \"{new_val}\" ")
+                                else:
+                                    print(f"\nSuccessfully changed to new value \"{new_val}\" ")
                     rows.append(row)
 
             with open(file_path, mode="w", newline="") as write_file:
@@ -847,7 +850,8 @@ def by_price(book_path, col_header, field, searching=True):
             except Exception as e:
                 print(f"\n Price  Search Error: {e}")
 
-# ------------------ Borrow Book
+## ------------------ Borrow Book
+
 def borrow_bID_title_qty(book_path, id_header, title_header, total_qty_h):
     book_file_exist = check_file_existance(book_path)
     if book_file_exist:
@@ -961,7 +965,7 @@ def return_date(curr_date, running = True):
         except Exception as e:
             print(f"\n Return Date Error: {e}")
 
-
+## ----------------------- Return BOOK
 def returned_by_id_un(borrow_path, user_path,user_header, user_id_h, running = True):
     while running:
         try:
@@ -1049,3 +1053,50 @@ def del_returnedbooks(borrowed_path, borrow_id_h, borrow_id):
 
     except Exception as e:
         print(f"Delete Borrowed CSV ERROR: {e}")
+
+##--------------------- Extend Book
+def extend_user_book_id(borrow_path, borrow_h, bid_h,uid_h, username_h ):
+    try: 
+        with open(borrow_path, mode = "r") as borrow_file:
+            borrowed= csv.DictReader(borrow_file)
+            user_found = False
+            book_found = False
+            borrow_id = None
+            user = input("Enter the User ID or Username: ")
+            if not user:
+                raise ValueError("Please donot leave it empty!!!")
+            if user.isdigit():
+                user = int(user)
+            else:
+                user = user.strip().title()
+
+            for borrow in borrowed:
+                    if user == int(borrow[uid_h]) or user == borrow[username_h]:
+                        user_found = True
+                        uID = int(borrow[uid_h])
+                        book_id = int(input("Enter the Book ID: "))
+                        if book_id == int(borrow[bid_h]):
+                            book_found = True
+                            borrow_id = int(borrow[borrow_h])
+                            return borrow_id
+        
+            if not user_found:
+                print(f"User not found")
+            if user_found and not book_found:
+                print(f"User have not borrowed this book!!!")
+                view_row(borrow_path, uid_h, uID, return_csv=True)
+
+    except Exception as e:
+        print(f"Extend Book Error: {e}")
+
+def extend_book_deadline(borrow_path, borrow_h, borrow_id,return_date_h):
+        try:
+            curr_date = dt.now().strftime("%Y-%m-%d")
+            new_return_date = return_date(curr_date)
+            #path, file uni id header and id number, col to be changed, changing value
+            edit_value(borrow_path, borrow_h, borrow_id, return_date_h, new_return_date, extend_date= True)
+        except Exception as e:
+            print(f"\n Extending Deadling Error: {e}")
+
+#borrow_book_path= r"LibraryManagement\LibM1\borrowed_books.csv"
+#extend_book_deadline(borrow_book_path, "B_ID", "U_ID")

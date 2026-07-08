@@ -8,7 +8,8 @@ def user_details(user_path,running= True):
     if file_exists:
         while running:
             print("\n1. To View first All User")
-            print(f"3. To View Last {c} user")
+            print(f"2. To View first {c} User")
+            print(f"3. To View Last {c} User")
             print(f"4. Exit")
             
             try:
@@ -482,10 +483,10 @@ def return_book(return_book_path, borrowed_book_path, user_path, book_path, runn
                     if choice:
                         choice =int(choice)
                         if choice==1:
-                            user_header = "U_ID" 
+                            user_header = user_id_h 
                             is_borrowed, user_id = v.returned_by_id_un(borrowed_book_path,user_path, user_header, user_id_h)
                         elif choice ==2:
-                            user_header = "Username"
+                            user_header = username_h
                             is_borrowed, user_id = v.returned_by_id_un(borrowed_book_path,user_path, user_header, user_id_h)
                     
                         elif choice ==3:
@@ -543,6 +544,39 @@ def search_operation(book_path,user_path, running = True):
         except Exception as e:
             print(f"Search Operation Error: {e}")
 
+def book_circulation(book_path,user_path, borrow_book_path, return_book_path, running = True):
+    while running:
+        borrow_id_h = "Borrow ID"
+        book_id_h = "B_ID"
+        user_id_h= "U_ID"
+        username_h = "Username"
+        return_date_h = "Return Date"
+        try:
+            choice = m.book_borrow_return_menu()
+            if choice:
+                choice= int(choice)
+                if choice ==1:
+                    df = pd.read_csv(borrow_book_path)
+                    print("\nBorrowed Books:\n")
+                    print(pd.DataFrame(df))
+                elif choice ==2:
+                    df = pd.read_csv(return_book_path)
+                    print("\nReturned Books:\n")
+                    print(pd.DataFrame(df))
+                elif choice ==3:
+                    borrow_book(borrow_book_path, book_path, user_path)
+                elif choice ==4:
+                    return_book(return_book_path, borrow_book_path,user_path,book_path)
+                elif choice ==5:
+                    borrow_id = v.extend_user_book_id(borrow_book_path, borrow_id_h, book_id_h, user_id_h, username_h)
+                    if borrow_id:
+                        v.extend_book_deadline(borrow_book_path, borrow_id_h, borrow_id,return_date_h)
+                elif choice ==6:
+                    break
+                else:
+                    print(f"Please Select from the given option!!!")
+        except Exception as e:
+            print(f"Search Operation Error: {e}")
     
 def main_func(role="Admin",is_running = True):
     book_path = r"LibraryManagement\LibM1\books.csv"
@@ -571,15 +605,12 @@ def main_func(role="Admin",is_running = True):
                     book_crud(user_path)
 
                 elif user_choice==5:
-                    borrow_book(borrow_book_path, book_path, user_path)
-
+                    book_circulation(book_path, user_path, borrow_book_path, return_book_path)
+                
                 elif user_choice==6:
-                    return_book(return_book_path, borrow_book_path,user_path,book_path)
-
-                elif user_choice==7:
                     search_operation(book_path, user_path)
 
-                elif user_choice==8:
+                elif user_choice==7:
                     print("\nThank you for using <3")
                     break
                 else:
