@@ -5,19 +5,36 @@ def admin_dashboard():
     print("2. Books List ")
     print("3. User Sub Menu ")
     print("4. Book Sub Menu ")
-    print("5. Borrow Book ")
-    print("6. Return Book ")
-    print("7. Search Operation ")
-    print("8. Exit ") 
+    print("5. Borrow and Return ")
+    print("6. Search Operation ")
+    print("7. Exit ") 
     print("----------------------------------\n")
+
+def book_borrow_return_menu():
+    try:
+        print("\n-----Borrow and Return Books-----")
+        print("1. View Borrowed Books ")
+        print("2. View Returned Books ")
+        print("3. Borrow Book ")
+        print("4. Return Book ")
+        print("5. Extend Deadline ")
+        print("6. Exit ")
+        print("----------------------------\n")
+        choice = input("\nChoose Option: ")
+        if choice:
+            return choice
+        if not choice:
+            raise ValueError ("Please donot leave it empty!!!")
+    except ValueError as ve:
+        print(f"\n Delete Value Error: {ve}")
 
 def main_search_menu():
     try:
         print("\n-----Search OPERATION-----")
         print("1. User Search Menu")
         print("2. Book Search Menu ")
-        print("3. Search Menu")
-        print("4. Search Menu")
+        print("3. Borrow Search Menu")
+        print("4. Return Search Menu")
         print("5. Exit ")
         print("----------------------------\n")
         choice = input("\nChoose Option: ")
@@ -132,22 +149,41 @@ def return_by():
         print(f"\n Delete Value Error: {ve}")
 
 def search_borrowed_menu():
-    print("\n--------- Search ---------")
-    print("1. User ID ")
-    print("2. Username ")
-    print("3. Book ID ")
-    print("4. Title ")
-    print("5. Borrowed Date ")
-    print("6. Overdue Days")
-    print("6. Exit ")
-    print("--------------------------\n")
+    try:
+        print("\n--------- Search ---------")
+        print("1. User ID ")
+        print("2. Username ")
+        print("3. Book ID ")
+        print("4. Title ")
+        print("5. Borrowed Date ")
+        print("6. Return Date ")
+        print("7. Overdue Days")
+        print("8. Exit ")
+        print("--------------------------\n")
+        choice = input("\nChoose Option: ")
+        if not choice:
+            raise ValueError ("Please dont leave it empty!!")
+        else:
+            return choice
+
+    except ValueError as ve:
+        print(f"\n Seach Borrow Book Error: {ve}")
 
 def search_returned_menu():
-    print("\n--------- Search ---------")
-    print("1. User ID ")
-    print("2. Username ")
-    print("3. Book ID ")
-    print("4. Title ")
-    print("5. Returned Date ")
-    print("6. Exit ")
-    print("--------------------------\n")
+    try:
+        print("\n--------- Search ---------")
+        print("1. User ID ")
+        print("2. Username ")
+        print("3. Book ID ")
+        print("4. Title ")
+        print("5. Returned Date ")
+        print("6. Exit ")
+        print("--------------------------\n")
+        choice = input("\nChoose Option: ")
+        if not choice:
+            raise ValueError ("Please dont leave it empty!!")
+        else:
+            return choice
+
+    except ValueError as ve:
+        print(f"\n Search Return Book Error: {ve}")

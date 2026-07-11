@@ -82,26 +82,29 @@ def float_check(u_input):
         print(f"\n Invalid Input!!!")
     elif u_input.isdigit():
         return float(u_input)
+
+#checks whether the user has given input value or not if not rasise error    
+def empty_validation(user_input):
+    if not user_input:
+        raise ValueError ("Please dont leave it empty")
     
 def check_uid_for_each(id_type, search = False, borrow = False):
     if id_type == "U_ID":
         if search==True:
             id = input("\nEnter the User ID to search: ").capitalize()
-        if borrow==True:
+        elif borrow==True:
             id = input("\nEnter the User ID of borrowed book: ").capitalize()
-        else:
+        elif not search and not borrow:
             id = input("\nEnter the user id to edit: ").capitalize()
-        if not id:
-            raise ValueError("Please enter the user id!!!")
+        empty_validation(id)
     if id_type == "B_ID":
         if search==True:
             id = input("\nEnter the Book ID to search: ").capitalize()
-        if borrow==True:
+        elif borrow==True:
             id = input("\nEnter the Book ID: ").capitalize()
-        else:
+        elif not search and not borrow:
             id = input("\nEnter the book id to edit: ").capitalize()
-        if not id:
-            raise ValueError("Please enter the book id!!!")
+        empty_validation(id)
     if id:     
         return id
 
@@ -172,11 +175,11 @@ def edit_value(file_path, id_type , id_no, column, new_val, extend_date = False)
 def view_row (path, id_type, id,return_csv = False):
     rows = []
     with open (path, mode="r") as read_file:
-            reader = csv.DictReader(read_file)
+        reader = csv.DictReader(read_file)
 
-            for row in reader:
-                if int(row[id_type])== id:
-                    rows.append(row)
+        for row in reader:
+            if int(row[id_type])== id:
+                rows.append(row)
     df = pd.DataFrame(rows)
     if id_type == "U_ID" and return_csv == False:
         fields =["U_ID", "Username","Role", "Status", "Created Date"] 
@@ -187,7 +190,7 @@ def view_row (path, id_type, id,return_csv = False):
     print(df.to_string(index=False))
 
 #for search 
-def by_id(path, col_header, running= True):
+def by_id(path, col_header, borrow_return = False,running= True,):
     file_exists = check_file_existance(path)
     if file_exists:
         while running:
@@ -217,16 +220,20 @@ def by_id(path, col_header, running= True):
                 print(f"\n Search ID Error: {e}")
             if found:
                 df = pd.DataFrame(rows)
-                if col_header == "U_ID":
+                if col_header == "U_ID" and not borrow_return:
                     print(f"\nUser ID {search_id}: \n")
                     fields =["U_ID", "Username","Role", "Status", "Created Date"]
                     df = df[fields]
                     print(df.to_string())
+                elif col_header == "U_ID" and borrow_return:
+                    print(f"\nSearch Result: \n")
+                    print(df.to_string())
+
                 elif col_header =="B_ID":
                     print(f"\nBook ID {search_id}: \n")
                     print(df.to_string())
 
-def by_created_date(path, header, id_header, running = True):
+def by_created_date(path, header, id_header, borrow =False, return_b =False, running = True):
     file_exists = check_file_existance(path)
     if file_exists:
         while running:
@@ -240,16 +247,27 @@ def by_created_date(path, header, id_header, running = True):
                     result = search_result(path, header, search_date)
                     if result:
                         df = pd.DataFrame(result)
-                        if id_header =="U_ID":
-                            fields =["U_ID", "Username","Role", "Status", "Created Date"]
-                            df=df[fields]
-
-                            print(f"\nUser's Created in {search_date}: \n")
+                        if borrow and return_b:
+                            print(f"\nBooks to be returned on: {search_date}\n")
                             print(df.to_string())
+                        elif borrow:
+                            print(f"\nBooks Borrowed on {search_date}: \n ")
+                            print(df.to_string())
+                        elif return_b:
+                            print(f"\nBooks Returned on {search_date}:\n")
+                            print(df.to_string())
+                            
+                        else:
+                            if id_header =="U_ID":
+                                fields =["U_ID", "Username","Role", "Status", "Created Date"]
+                                df=df[fields]
 
-                        elif id_header=="B_ID":
-                            print(f"\nBooks Created in {search_date}: \n")
-                            print(df.to_string()) 
+                                print(f"\nUser's Created in {search_date}: \n")
+                                print(df.to_string())
+
+                            elif id_header=="B_ID":
+                                print(f"\nBooks Created in {search_date}: \n")
+                                print(df.to_string()) 
 
             except Exception as e:
                 print(f"\n Created Date Error: {e}")
@@ -779,7 +797,7 @@ def by_isbn(book_path, col_header, field, searching = True):
             except Exception as e:
                 print(f"\n ISBN Search Error: {e}")
 
-def by_isbn(book_path, col_header, field, searching = True):
+def by_author(book_path, col_header, field, searching = True):
     file_exists = check_file_existance(book_path)
     if file_exists:
         while searching:
@@ -1098,5 +1116,26 @@ def extend_book_deadline(borrow_path, borrow_h, borrow_id,return_date_h):
         except Exception as e:
             print(f"\n Extending Deadling Error: {e}")
 
-#borrow_book_path= r"LibraryManagement\LibM1\borrowed_books.csv"
+borrow_book_path= r"LibraryManagement\LibM1\borrowed_books.csv"
 #extend_book_deadline(borrow_book_path, "B_ID", "U_ID")
+
+#-------------------- Search Borrowed Books
+def by_overdue(path, col_header, fields, searching= True):
+    while searching:
+        try:
+            overdue_days = input("\nEnter the overdue days: ").title()
+            searching = breaking(overdue_days)
+            empty_validation(overdue_days)
+            #overdue_days = int_check(overdue_days)
+            if overdue_days and overdue_days!= "Q":
+                result = search_result(path, col_header, overdue_days)
+
+                if result:
+                    print(f"\nBook overdue {overdue_days} days: \n")
+                    df =pd.DataFrame(result)
+                    df =df[fields]
+                    print(df.to_string())
+                else:
+                    print(f"\n Overdue of {overdue_days} days not  found!!!")
+        except Exception as e:
+            print(f"Overdue days Search Error: {e}")

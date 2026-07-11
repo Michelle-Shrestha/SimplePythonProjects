@@ -399,7 +399,7 @@ def book_search(book_path, m_running= True):
                 elif user_input==3:
                     v.by_isbn(book_path, isbn_header, fields)
                 elif user_input==4:
-                    v.by_isbn(book_path, author_header, fields)
+                    v.by_author(book_path, author_header, fields)
                 elif user_input==5:
                     v.by_publishedY(book_path, published_year_header, fields)
                 elif user_input==6:
@@ -527,16 +527,85 @@ def return_book(return_book_path, borrowed_book_path, user_path, book_path, runn
                 except Exception as e:
                     print(f"\nReturn CSV File Error: {e}")
 
-def search_operation(book_path,user_path, running = True):
+def search_borrow_book(borrow_path, running = True):
+    borrow_id_h = "Borrow ID"
+    book_id_header = "B_ID"
+    book_title_header = "Title"
+    user_id_header = "U_ID"
+    username_header = "Username"
+    borrowed_date_header = "Borrowed Date"
+    return_date_header = "Return Date"
+    overdue_header = "Overdue"
+    fields = ["Borrow ID", book_id_header, book_title_header, user_id_header, username_header, borrowed_date_header, return_date_header, overdue_header]
+    while running:
+        try:
+            choice = m.search_borrowed_menu()
+            if choice:
+                choice=v.int_check(choice)
+                if choice ==1:
+                    v.by_id(borrow_path, user_id_header, borrow_return=True)
+                elif choice ==2:
+                    v.by_username(borrow_path, username_header,fields)
+                elif choice ==3:
+                    v.by_id(borrow_path, book_id_header, borrow_return=True)
+                elif choice ==4:
+                    v.by_title(borrow_path, book_title_header, fields)
+                elif choice ==5:
+                    v.by_created_date(borrow_path, borrowed_date_header, book_id_header, borrow=True )
+                elif choice ==6:
+                    v.by_created_date(borrow_path, return_date_header, book_id_header, borrow=True, return_b= True )
+                elif choice ==7:
+                    v.by_overdue(borrow_path, overdue_header,fields)
+                elif choice ==8:
+                    break
+                else:
+                    print(f"\nPlease Select from the given option!!!")
+        except Exception as e:
+            print(f"\n Borrow Book Search Error: {e}")
+
+def search_return_book(return_path, running = True):
+    book_id_h = "B_ID"
+    book_title_h = "Title"
+    user_id_h = "U_ID"
+    username_h = "Username"
+    return_date_h = "Return Date"
+    fields = ["Return ID", "Borrow ID", "B_ID", "Title", "U_ID", "Username", "Return Date"]
+    while running:
+        try:
+            choice = m.search_returned_menu()
+            if choice:
+                choice=v.int_check(choice)
+                if choice ==1:
+                    v.by_id(return_path, user_id_h, borrow_return=True)
+                elif choice ==2:
+                    v.by_username(return_path, username_h, fields)
+                elif choice ==3:
+                    v.by_id(return_path, book_id_h, borrow_return=True)
+                elif choice ==4:
+                    v.by_title(return_path, book_title_h, fields)
+                elif choice ==5:
+                    v.by_created_date(return_path,return_date_h, book_id_h, borrow=False, return_b=True)
+                elif choice ==6:
+                    break
+                else:
+                    print(f"\nPlease Select from the given option!!!")
+        except Exception as e:
+            print(f"\n Return Book Search Error: {e}")
+
+def search_operation(book_path,user_path, borrow_path, return_path, running = True):
     while running:
         try:
             choice = m.main_search_menu()
             if choice:
-                choice= int(choice)
+                choice= v.int_check(choice)
                 if choice ==1:
                     user_search(user_path)
                 elif choice ==2:
                     book_search(book_path)
+                elif choice ==3:
+                    search_borrow_book(borrow_path)
+                elif choice ==4:
+                    search_return_book(return_path)
                 elif choice ==5:
                     break
                 else:
@@ -608,7 +677,7 @@ def main_func(role="Admin",is_running = True):
                     book_circulation(book_path, user_path, borrow_book_path, return_book_path)
                 
                 elif user_choice==6:
-                    search_operation(book_path, user_path)
+                    search_operation(book_path, user_path,borrow_book_path, return_book_path)
 
                 elif user_choice==7:
                     print("\nThank you for using <3")
