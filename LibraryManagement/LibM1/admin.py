@@ -620,6 +620,7 @@ def book_circulation(book_path,user_path, borrow_book_path, return_book_path, ru
         user_id_h= "U_ID"
         username_h = "Username"
         return_date_h = "Return Date"
+        overdue_h = "Overdue"
         try:
             choice = m.book_borrow_return_menu()
             if choice:
@@ -641,6 +642,8 @@ def book_circulation(book_path,user_path, borrow_book_path, return_book_path, ru
                     if borrow_id:
                         v.extend_book_deadline(borrow_book_path, borrow_id_h, borrow_id,return_date_h)
                 elif choice ==6:
+                    v.update_overdue(borrow_book_path, return_date_h, overdue_h)
+                elif choice ==7:
                     break
                 else:
                     print(f"Please Select from the given option!!!")

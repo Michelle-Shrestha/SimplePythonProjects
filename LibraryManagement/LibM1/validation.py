@@ -1117,7 +1117,7 @@ def extend_book_deadline(borrow_path, borrow_h, borrow_id,return_date_h):
             print(f"\n Extending Deadling Error: {e}")
 
 borrow_book_path= r"LibraryManagement\LibM1\borrowed_books.csv"
-#extend_book_deadline(borrow_book_path, "B_ID", "U_ID")
+#extend_book_deadline(borrow_book_path, "B_ID", "U_ID", "Return Date")
 
 #-------------------- Search Borrowed Books
 def by_overdue(path, col_header, fields, searching= True):
@@ -1139,3 +1139,45 @@ def by_overdue(path, col_header, fields, searching= True):
                     print(f"\n Overdue of {overdue_days} days not  found!!!")
         except Exception as e:
             print(f"Overdue days Search Error: {e}")
+
+
+def overdue(return_date):
+    try:
+        #borr_d = dt.strptime(borrowed_date, "%Y-%m-%d")
+        ret_d = dt.strptime(return_date, "%Y-%m-%d")
+        curr_date = dt.now().strftime(r"%Y-%m-%d")
+        curr_date = dt.strptime(curr_date, "%Y-%m-%d")
+        overdue_days = (curr_date- ret_d).days #only returns the days in int data type
+        if overdue_days < 0:
+            return 0
+        else:
+            return overdue_days
+    except Exception as e:
+        print(f"\n Overdue Error: {e}")
+
+#print(overdue("2026-6-9", "2026-6-7"))
+    
+def update_overdue(borrowed_path,return_d_h, overdue_h):
+    try:
+        rows= []
+        with open (borrowed_path, mode = "r") as borrow_file:
+            reading = csv.DictReader(borrow_file)
+            fields = reading.fieldnames
+            for row in reading:
+                return_d = row[return_d_h]
+                overdue_days = overdue(return_d)
+                if overdue_days == None:
+                    overdue_days = 0
+                row[overdue_h] = overdue_days
+                rows.append(row)
+        
+        with open(borrowed_path, mode="w", newline="") as write_file:
+            writing = csv.DictWriter(write_file, fields)
+            writing.writeheader()
+            for row in rows:
+                writing.writerow(row)
+            print("\nSuccessfully Overdues Updated")
+
+    except Exception as e:
+        print(f"\n Overdue updating error: {e}")
+#update_overdue(borrow_book_path, "Return Date", "Overdue")

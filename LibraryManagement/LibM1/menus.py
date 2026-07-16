@@ -18,7 +18,8 @@ def book_borrow_return_menu():
         print("3. Borrow Book ")
         print("4. Return Book ")
         print("5. Extend Deadline ")
-        print("6. Exit ")
+        print("6. Update Overdue Days")
+        print("7. Exit ")
         print("----------------------------\n")
         choice = input("\nChoose Option: ")
         if choice:
